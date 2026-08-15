@@ -1,0 +1,16 @@
+{% extends "registration/master_reg.html" %}
+
+{% block title %}
+<title>Sign up — EV-TRACS</title>
+{% endblock %}
+
+{% block heading %}
+<h1>Create account</h1>
+<p class="ap-auth-sub">Set up an EV-TRACS account to get started.</p>
+{% endblock %}
+
+{% block submit_label %}Create Account{% endblock %}
+
+{% block additional %}
+Already have an account? <a href="{% url 'login' %}">Sign in</a>
+{% endblock %}

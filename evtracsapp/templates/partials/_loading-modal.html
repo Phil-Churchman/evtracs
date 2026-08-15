@@ -1,0 +1,31 @@
+{% load static %}
+
+<script>
+  function showPleaseWait() {
+    if (document.querySelector("#pleaseWaitDialog") == null) {
+      var modalLoading =
+        '<div class="modal fade" id="pleaseWaitDialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="modal-title" aria-hidden="true">\
+            <div class="modal-dialog modal-sm modal-dialog-centered">\
+                <div class="modal-content">\
+                    <div class="modal-body text-center">\
+                        <div class="d-flex justify-content-center mb-3">\
+                          <span class="ap-spinner"></span>\
+                        </div>\
+                        <h5 class="modal-title" id="modal-title">One moment…</h5>\
+                        <div class="ap-activity mt-3"></div>\
+                    </div>\
+                </div>\
+            </div>\
+        </div>';
+      $(document.body).append(modalLoading);
+    }
+
+    $("#pleaseWaitDialog").modal("show");
+  }
+
+  function cancelPleaseWait() {
+    if (document.querySelector("#pleaseWaitDialog") != null) {
+        $("#pleaseWaitDialog").modal('toggle');
+    }
+  }
+</script>

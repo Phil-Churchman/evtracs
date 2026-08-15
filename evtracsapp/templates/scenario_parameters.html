@@ -1,0 +1,136 @@
+{% extends "master.html" %}
+
+{% block title %}<title>{{ scenario.name }} parameters — EV-TRACS</title>{% endblock %}
+
+{% block content %}
+<div class="ap-shell ap-shell-narrow">
+
+  <header class="ap-page-head">
+    <p class="ap-eyebrow mb-2">
+      <a href="{% url 'scenarios' %}" class="ap-back"><i class="bi bi-chevron-left"></i> Scenarios</a>
+    </p>
+    <h1>{{ scenario.name }}</h1>
+    <p class="ap-lead mt-2">
+      Simulation parameters for this scenario.
+      {% if scenario.is_active %}<span class="ap-pill is-live ms-1">Active</span>{% endif %}
+    </p>
+  </header>
+
+  {% include 'partials/_messages.html' %}
+
+  {% if form.non_field_errors or form.collection_errors %}
+    <div class="alert alert-danger">
+      <strong class="d-block mb-1">Please fix the following:</strong>
+      <ul class="mb-0 ps-3">
+        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+        {% for error in form.collection_errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {# --- Simulation window --- #}
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-clock text-body-secondary"></i>
+        <span class="card-title">Simulation</span>
+      </div>
+      <div class="card-body">
+        <div class="ap-param-cols">
+          {% include 'partials/_param_field.html' with field=form.start_time %}
+          {% include 'partials/_param_field.html' with field=form.end_time %}
+          {% include 'partials/_param_field.html' with field=form.simulation_step_sec %}
+        </div>
+
+        <hr class="ap-hairline my-3">
+
+        <div class="ap-switch-row">
+          <div class="form-check form-switch">
+            {{ form.demand_model }}
+            <label class="form-check-label" for="{{ form.demand_model.id_for_label }}">
+              {{ form.demand_model.label }}
+            </label>
+          </div>
+          <div class="form-check form-switch">
+            {{ form.speed_based_routing }}
+            <label class="form-check-label" for="{{ form.speed_based_routing.id_for_label }}">
+              {{ form.speed_based_routing.label }}
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# --- Agents --- #}
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center justify-content-between gap-2">
+        <span class="card-title d-flex align-items-center gap-2">
+          <i class="bi bi-people text-body-secondary"></i> Agents
+        </span>
+        <span class="ap-eyebrow">{{ parameters.total_agents }} per day</span>
+      </div>
+      <div class="card-body">
+        <div class="ap-param-cols mb-4">
+          {% include 'partials/_param_field.html' with field=form.animation_agents %}
+          {% include 'partials/_param_field.html' with field=form.probability_hail %}
+        </div>
+
+        <label class="form-label d-block">Agents active by hour</label>
+        <p class="ap-hint">One value per hour of the day, starting at midnight.</p>
+        <div class="ap-hour-grid">
+          {% for field in form.hour_fields %}
+            <div class="ap-hour-cell{% if field.errors %} has-error{% endif %}">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    {# --- Distances --- #}
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-rulers text-body-secondary"></i>
+        <span class="card-title">Distances &amp; routing</span>
+      </div>
+      <div class="card-body">
+        <div class="ap-param-cols">
+          {% include 'partials/_param_field.html' with field=form.max_total_distance_m %}
+          {% include 'partials/_param_field.html' with field=form.buffer_distance %}
+          {% include 'partials/_param_field.html' with field=form.passenger_max_dist %}
+          {% include 'partials/_param_field.html' with field=form.deviation_factor %}
+          {% include 'partials/_param_field.html' with field=form.swap_wait_sec %}
+        </div>
+      </div>
+    </div>
+
+    {# --- Road speeds --- #}
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-signpost-split text-body-secondary"></i>
+        <span class="card-title">Road speeds (km/h)</span>
+      </div>
+      <div class="card-body">
+        <p class="ap-hint mb-3">Assumed travel speed for each OSM highway type. Zero means impassable.</p>
+        <div class="ap-road-grid">
+          {% for field in form.road_fields %}
+            <div class="ap-road-cell{% if field.errors %} has-error{% endif %}">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="ap-form-actions">
+      <button type="submit" class="btn btn-primary">Save parameters</button>
+      <a href="{% url 'scenarios' %}" class="btn btn-secondary">Back</a>
+    </div>
+  </form>
+
+</div>
+{% endblock %}
