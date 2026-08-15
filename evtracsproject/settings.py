@@ -147,7 +147,7 @@ if os.environ.get('DEV') == "false":
 
     root = 'https://'+ os.environ['WEBSITE_HOSTNAME']
 
-    CSRF_TRUSTED_ORIGINS = [root, "https://*", "http://*", "https://www.geologger.pathplotter.net", "https://geologger.pathplotter.net"]
+    CSRF_TRUSTED_ORIGINS = [root, "https://*", "http://*", "https://www.evtracs.pathplotter.net", "https://evtracs.pathplotter.net"]
     CORS_ALLOW_ALL_ORIGINS = True
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOW_HEADERS = [
