@@ -30,19 +30,27 @@
     );
   }
 
-  function tile(href, icon, tint, title, blurb) {
+  function tile(href, icon, tint, title, blurb, available) {
+    // A tile for data this scenario has not published still explains what the
+    // page is for, but says plainly that there is nothing behind it.
+    var body =
+      '<div class="ap-tile-icon' + (tint ? " " + tint : "") + '"><i class="bi ' + icon +
+      '"></i></div><h3>' + title + "</h3><p>" + blurb + "</p>";
+
+    if (!available) {
+      return (
+        '<div class="col-12 col-md-6"><div class="ap-tile ap-tile-muted">' +
+        body +
+        '<div class="ap-tile-more text-body-secondary">Not published</div></div></div>'
+      );
+    }
+
     return (
       '<div class="col-12 col-md-6"><a class="ap-tile ap-card-hover text-decoration-none" href="' +
       href +
-      '"><div class="ap-tile-icon' +
-      (tint ? " " + tint : "") +
-      '"><i class="bi ' +
-      icon +
-      '"></i></div><h3>' +
-      title +
-      "</h3><p>" +
-      blurb +
-      '</p><div class="ap-tile-more">Open <i class="bi bi-arrow-right"></i></div></a></div>'
+      '">' +
+      body +
+      '<div class="ap-tile-more">Open <i class="bi bi-arrow-right"></i></div></a></div>'
     );
   }
 
@@ -50,20 +58,48 @@
     var summary = document.getElementById("summary");
     var tiles = document.getElementById("tiles");
 
+    var animation = scenario.animation || {};
+
     tiles.innerHTML =
       tile(
         E.scenarioUrl("parameters.html", scenario.id),
         "bi-sliders",
         "",
         "Parameters",
-        "Simulation window, agents, distances and road speeds."
+        "Simulation window, agents, distances and road speeds.",
+        Boolean(scenario.parameters)
       ) +
       tile(
         E.scenarioUrl("area.html", scenario.id),
         "bi-map",
         "is-green",
         "Area",
-        "The area this scenario covers, on a map you can explore."
+        "The area this scenario covers, on a map you can explore.",
+        Boolean(scenario.area)
+      ) +
+      tile(
+        E.scenarioUrl("animation.html", scenario.id),
+        "bi-play-circle",
+        "is-purple",
+        "Trip animation",
+        "Every agent's day played back over the map.",
+        Boolean(animation.agent_count)
+      ) +
+      tile(
+        E.scenarioUrl("stations.html", scenario.id),
+        "bi-lightning-charge",
+        "is-orange",
+        "Swap stations",
+        "Where the swap stations are, and what queued at each.",
+        Boolean(scenario.swap_stations && animation.station_log)
+      ) +
+      tile(
+        E.scenarioUrl("outputs.html", scenario.id),
+        "bi-images",
+        "is-purple",
+        "Outputs",
+        "The charts this scenario's run produced.",
+        Boolean((scenario.outputs || []).length)
       );
 
     // The stats need the scenario's own files; the tiles do not, so they are

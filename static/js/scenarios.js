@@ -24,12 +24,24 @@
         E.escapeHtml(scenario.id) +
         '">Make active</button>';
 
-    var area = scenario.area
-      ? '<a href="' +
-        E.scenarioUrl("area.html", scenario.id) +
-        '" class="btn btn-sm btn-outline-secondary" title="Area"><i class="bi bi-map"></i> Area</a>'
-      : '<button type="button" class="btn btn-sm btn-outline-secondary" disabled title="No area published">' +
-        '<i class="bi bi-map"></i> Area</button>';
+    var animation = scenario.animation || {};
+
+    /* A scenario only offers the pages it has data for; the rest stay visible
+       but disabled, so the row reads the same for every scenario. */
+    function action(page, icon, label, available, why) {
+      if (!available) {
+        return (
+          '<button type="button" class="btn btn-sm btn-outline-secondary" disabled title="' +
+          E.escapeHtml(why) +
+          '"><i class="bi ' + icon + '"></i> ' + label + "</button>"
+        );
+      }
+      return (
+        '<a href="' + E.scenarioUrl(page, scenario.id) +
+        '" class="btn btn-sm btn-outline-secondary" title="' + label + '">' +
+        '<i class="bi ' + icon + '"></i> ' + label + "</a>"
+      );
+    }
 
     return (
       '<li class="list-group-item ap-scenario-row' +
@@ -44,11 +56,17 @@
       "</div></div>" +
       '<div class="ap-scenario-actions">' +
       activate +
-      '<a href="' +
-      E.scenarioUrl("parameters.html", scenario.id) +
-      '" class="btn btn-sm btn-outline-secondary" title="Parameters">' +
-      '<i class="bi bi-sliders"></i> Parameters</a>' +
-      area +
+      action("parameters.html", "bi-sliders", "Parameters",
+             Boolean(scenario.parameters), "No parameters published") +
+      action("area.html", "bi-map", "Area",
+             Boolean(scenario.area), "No area published") +
+      action("animation.html", "bi-play-circle", "Animation",
+             Boolean(animation.agent_count), "No animation published") +
+      action("stations.html", "bi-lightning-charge", "Stations",
+             Boolean(scenario.swap_stations && animation.station_log),
+             "No swap station data published") +
+      action("outputs.html", "bi-images", "Outputs",
+             Boolean((scenario.outputs || []).length), "No charts published") +
       "</div></li>"
     );
   }

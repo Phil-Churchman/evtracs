@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EV-TRACS">
+    <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
+
+    <title>Trip animation — EV-TRACS</title>
+
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@7.5.2/ol.css">
+    <link href="static/css/apple.css" rel="stylesheet">
+  </head>
+
+  <body id="body">
+    <div id="site-nav"></div>
+
+    <div class="ap-shell ap-shell-wide">
+      <header class="ap-page-head">
+        <p class="ap-eyebrow mb-2">
+          <a href="scenarios.html" class="ap-back"><i class="bi bi-chevron-left"></i> Scenarios</a>
+        </p>
+        <h1 id="scenarioName">Trip animation</h1>
+        <p class="ap-lead mt-2">
+          Every agent's day, played back over the scenario's area.
+        </p>
+      </header>
+
+      <div id="pageError" hidden></div>
+
+      <div class="card p-0 overflow-hidden mb-3">
+        <div id="map" class="ap-map" style="height: 58vh; min-height: 380px;"></div>
+
+        <div class="ap-anim-controls">
+          <div class="ap-anim-row">
+            <div class="d-flex gap-2">
+              <button id="playBtn" class="btn btn-primary" disabled>Loading…</button>
+              <button id="resetBtn" class="btn btn-secondary" disabled>Reset</button>
+            </div>
+
+            <div class="ap-anim-speed">
+              <div class="d-flex align-items-center mb-1 gap-2">
+                <span class="form-label mb-0">Speed</span>
+                <span class="ap-mono" id="speedLabel">360x</span>
+              </div>
+              <input type="range" id="speedSlider" class="form-range" min="60" max="3000" value="360" step="60">
+            </div>
+
+            <div class="ap-anim-time">
+              <div class="d-flex align-items-center mb-1 gap-2">
+                <span class="form-label mb-0">Timeline</span>
+                <span class="ap-mono" id="timeLabel">Waiting for data…</span>
+              </div>
+              <input type="range" id="timeSlider" class="form-range" disabled>
+            </div>
+          </div>
+
+          <div class="ap-legend">
+            <strong>Trip type</strong>
+            <span id="taxiRankLegend" class="ap-legend-item">
+              <span class="ap-legend-dot" style="background:blue"></span>Taxi rank
+            </span>
+            <span id="hailLegend" class="ap-legend-item">
+              <span class="ap-legend-dot" style="background:purple"></span>Hail
+            </span>
+            <span id="passengerLegend" class="ap-legend-item">
+              <span class="ap-legend-dot" style="background:green"></span>Passenger
+            </span>
+            <span id="pickupLegend" class="ap-legend-item">
+              <span class="ap-legend-dot" style="background:orange"></span>Pickup
+            </span>
+            <span id="swapLegend" class="ap-legend-item">
+              <span class="ap-legend-dot" style="background:red"></span>Swap
+            </span>
+            <span id="idleLegend" class="ap-legend-item">
+              <span class="ap-legend-dot is-small" style="background:black"></span>Idle
+            </span>
+
+            <strong class="ms-2">Locations</strong>
+            <span id="swapLayerLegend" class="ap-legend-item">
+              <span class="ap-legend-star" style="background:red"></span>Swap station
+            </span>
+            <span id="rankLayerLegend" class="ap-legend-item">
+              <span class="ap-legend-star" style="background:blue"></span>Taxi rank
+            </span>
+
+            <span class="ap-pill ms-auto">Active agents:
+              <strong id="activeCounter" class="ms-1">0</strong>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <p class="ap-hint" id="loadNote"></p>
+    </div>
+
+    <script src="static/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol@7.5.2/dist/ol.js"></script>
+    <script src="static/js/app.js"></script>
+    <script src="static/js/animation.js"></script>
+    <script src="static/js/register-sw.js"></script>
+  </body>
+</html>

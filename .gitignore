@@ -183,3 +183,7 @@ cython_debug/
 # Local TLS certificate and key - never commit these
 cert.key
 cert.crt
+
+# Local tool that republishes data/ from the model. Not part of the site, and
+# it only works next to a Model/ and Model_data/ checkout.
+sync_evtracs.py

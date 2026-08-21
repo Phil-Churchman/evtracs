@@ -1141,6 +1141,13 @@ a.ap-tile:hover {
   line-height: 1.45;
 }
 
+/* A tile for something this scenario has not published: still legible, but
+   plainly not a link. */
+.ap-tile-muted {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
 .ap-tile-more {
   margin-top: auto;
   padding-top: 1rem;
@@ -1522,7 +1529,230 @@ kbd {
 label.btn { cursor: pointer; }
 
 /* -------------------------------------------------------------------------
-   18. Motion preferences
+   18. Animations
+   ---------------------------------------------------------------------- */
+
+/* Transport controls sit under the map, inside the same card. */
+.ap-anim-controls {
+  padding: 0.875rem 1rem 1rem;
+  border-top: 1px solid var(--ap-hairline);
+  background: var(--ap-surface);
+}
+
+.ap-anim-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+/* The timeline is the control people actually drag, so it gets the room. */
+.ap-anim-speed { flex: 1 1 160px; min-width: 140px; }
+.ap-anim-time  { flex: 2 1 280px; min-width: 200px; }
+
+.ap-anim-controls .form-range { width: 100%; }
+
+.ap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 0.875rem;
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--ap-hairline);
+  font-size: 0.8125rem;
+  color: var(--ap-ink-2);
+}
+
+.ap-legend strong {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-ink-4);
+}
+
+.ap-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ap-legend-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Idle draws smaller on the map, so its swatch matches the same ratio. */
+.ap-legend-dot.is-small { width: 6px; height: 6px; }
+
+.ap-legend-star {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  clip-path: polygon(
+    50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%,
+    50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%
+  );
+}
+
+/* Tooltip following the cursor over a swap station. */
+.ap-map-tip {
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: var(--ap-r-sm);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* --- Swap station playback ---------------------------------------------- */
+
+.ap-station-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ap-station-modal { max-width: 650px; }
+
+.ap-station-controls {
+  background: var(--ap-fill);
+  border-radius: var(--ap-r-md);
+  padding: 0.75rem;
+}
+
+/* A swap bay: dashed while free, solid and green once a vehicle is in it. */
+.ap-post-box {
+  border: 2px dashed var(--ap-blue);
+  background: var(--ap-blue-soft);
+  border-radius: var(--ap-r-sm);
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.25rem;
+  transition: background-color var(--ap-dur) var(--ap-ease),
+              border-color var(--ap-dur) var(--ap-ease);
+}
+
+.ap-post-box.is-occupied {
+  border-style: solid;
+  border-color: var(--ap-green);
+  background: rgba(var(--bs-success-rgb), 0.14);
+}
+
+.ap-post-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ap-ink-4);
+}
+
+.ap-post-free {
+  font-size: 0.8125rem;
+  color: var(--ap-ink-4);
+}
+
+.ap-queue-box {
+  border: 2px dashed var(--ap-orange);
+  background: rgba(var(--bs-warning-rgb), 0.12);
+  border-radius: var(--ap-r-sm);
+  min-height: 80px;
+  padding: 0.625rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: center;
+  gap: 0.375rem;
+}
+
+.ap-agent-badge {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--ap-r-pill);
+  white-space: nowrap;
+}
+
+.ap-agent-badge.is-swapping {
+  background: rgba(var(--bs-success-rgb), 0.2);
+  color: var(--ap-green);
+}
+
+.ap-agent-badge.is-queueing {
+  background: rgba(var(--bs-warning-rgb), 0.22);
+  color: var(--ap-orange);
+}
+
+/* -------------------------------------------------------------------------
+   19. Chart outputs
+   ---------------------------------------------------------------------- */
+
+/* One chart in the picker: fills its row so the whole strip is clickable. */
+.ap-output-pick {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: var(--ap-ink);
+  font-size: 0.9375rem;
+  transition: background-color var(--ap-dur) var(--ap-ease);
+}
+
+.ap-output-pick:hover { background: var(--ap-fill); }
+
+.ap-output-pick.is-on {
+  background: var(--ap-blue-soft);
+  color: var(--ap-blue);
+  font-weight: 500;
+}
+
+.ap-output-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ap-output-meta {
+  flex: none;
+  font-size: 0.75rem;
+  color: var(--ap-ink-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-output-pick.is-on .ap-output-meta { color: var(--ap-blue); }
+
+/* Charts are rendered on white by matplotlib, so they get a light plate in
+   both themes rather than glowing against a dark card. */
+.ap-chart-frame {
+  background: #ffffff;
+  border: 1px solid var(--ap-hairline);
+  border-radius: var(--ap-r-md);
+  padding: 0.5rem;
+  overflow-x: auto;
+}
+
+.ap-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Never blow a chart up past its own resolution - it only goes soft. */
+  max-width: 100%;
+}
+
+/* -------------------------------------------------------------------------
+   20. Motion preferences
    ---------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {

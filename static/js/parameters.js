@@ -9,16 +9,9 @@
 
   var E = window.EVTRACS;
 
+  // Only used to spot a scenario file that still carries speeds of its own;
+  // the table itself lives on the global parameters page.
   var ROAD_SPEED_KEY = "road_speed_km-h";
-  var HOURS_PER_DAY = 24;
-
-  // The order road types are shown in, which is the order the model lists them.
-  var ROAD_TYPES = [
-    "trunk", "trunk_link", "motorway", "motorway_link", "primary",
-    "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link",
-    "residential", "unclassified", "service", "footway", "pedestrian", "track",
-    "cycleway", "path", "steps", "services", "rest_area", "corridor", "raceway"
-  ];
 
   var MONTHS = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -105,6 +98,21 @@
 
   // --- Sections -------------------------------------------------------------
 
+  // The mode used to be a "demand_model" boolean; it is now a named mode, and
+  // files written before the change are still read the old way.
+  var MODE_LABELS = {
+    hail_rank: "Hail and taxi rank",
+    demand_model: "Demand model",
+    distribution: "Trip distribution"
+  };
+
+  function simulationMode(parameters) {
+    var mode =
+      parameters.simulation_mode ||
+      (parameters.demand_model ? "demand_model" : "hail_rank");
+    return MODE_LABELS[mode] || mode;
+  }
+
   function simulationCard(parameters) {
     return card(
       "bi-clock",
@@ -114,13 +122,44 @@
         field("Start time", formatParts(parameters.start_time)) +
         field("End time", formatParts(parameters.end_time)) +
         field("Simulation step", parameters.simulation_step_sec + " s") +
+        field("Mode", simulationMode(parameters)) +
         "</div>" +
         '<hr class="ap-hairline my-3">' +
         '<div class="ap-switch-row">' +
-        flag("Use demand model", parameters.demand_model) +
         flag("Speed-based routing", parameters.speed_based_routing) +
         "</div>"
     );
+  }
+
+  /* The agent counts split the simulation window into that many equal periods,
+     rather than being hourly: 24 values over a day are hourly, 8 are
+     three-hourly. So the labels are worked out from the window, which
+     reproduces the familiar 00:00, 01:00, ... for the usual 24-over-a-day. */
+  function periodLabeller(parameters, periods) {
+    if (!periods || !parameters.start_time || !parameters.end_time) {
+      return null;
+    }
+    var startMs = toDate(parameters.start_time).getTime();
+    var periodMs = (toDate(parameters.end_time).getTime() - startMs) / periods;
+    if (!isFinite(periodMs) || periodMs <= 0) {
+      return null;
+    }
+    return {
+      periodMs: periodMs,
+      label: function (index) {
+        var at = new Date(startMs + index * periodMs);
+        return pad(at.getUTCHours()) + ":" + pad(at.getUTCMinutes());
+      }
+    };
+  }
+
+  function describeSpan(ms) {
+    var minutes = Math.round(ms / 60000);
+    if (minutes % 60 === 0) {
+      var hours = minutes / 60;
+      return hours + (hours === 1 ? " hour" : " hours");
+    }
+    return minutes + " min";
   }
 
   function agentsCard(parameters) {
@@ -129,22 +168,33 @@
       return sum + count;
     }, 0);
 
-    var hours = "";
-    for (var hour = 0; hour < HOURS_PER_DAY; hour++) {
-      hours += cell("ap-hour-cell", pad(hour) + ":00", agents[hour] == null ? "—" : agents[hour]);
-    }
+    var periods = periodLabeller(parameters, agents.length);
+    var grid = agents
+      .map(function (count, index) {
+        return cell(
+          "ap-hour-cell",
+          periods ? periods.label(index) : "#" + (index + 1),
+          count
+        );
+      })
+      .join("");
+
+    var hint = periods
+      ? "One value per period. The run is split into " + agents.length +
+        " periods of " + describeSpan(periods.periodMs) + ", labelled by when each starts."
+      : "One value per period, in order.";
 
     return card(
       "bi-people",
       "Agents",
-      total.toLocaleString() + " per day",
+      total.toLocaleString() + " in total",
       '<div class="ap-param-cols mb-4">' +
         field("Animation agents", parameters.animation_agents) +
         field("Probability of hailing", parameters.probability_hail) +
         "</div>" +
-        '<span class="form-label d-block">Agents active by hour</span>' +
-        '<p class="ap-hint">One value per hour of the day, starting at midnight.</p>' +
-        '<div class="ap-hour-grid">' + hours + "</div>"
+        '<span class="form-label d-block">Agents introduced per period</span>' +
+        '<p class="ap-hint">' + hint + "</p>" +
+        '<div class="ap-hour-grid">' + grid + "</div>"
     );
   }
 
@@ -163,29 +213,26 @@
     );
   }
 
+  /* Road speeds are calibrated once and applied to every run, so they are not
+     shown here. A scenario file written before that change may still carry its
+     own copy, which the model ignores - say so rather than rendering values
+     that are not the ones being used. */
   function roadSpeedsCard(parameters) {
-    var speeds = parameters[ROAD_SPEED_KEY] || {};
-    // Anything the file adds beyond the known list is still worth showing.
-    var types = ROAD_TYPES.filter(function (type) {
-      return type in speeds;
-    }).concat(
-      Object.keys(speeds).filter(function (type) {
-        return ROAD_TYPES.indexOf(type) === -1;
-      })
-    );
-
-    var grid = types
-      .map(function (type) {
-        return cell("ap-road-cell", type.replace(/_/g, " "), speeds[type]);
-      })
-      .join("");
+    var stale = parameters[ROAD_SPEED_KEY]
+      ? '<p class="ap-hint mb-0 mt-2"><i class="bi bi-exclamation-circle"></i> ' +
+        "This scenario file still carries its own road speeds. They are ignored: " +
+        "the global table is what runs.</p>"
+      : "";
 
     return card(
       "bi-signpost-split",
-      "Road speeds (km/h)",
-      types.length + " types",
-      '<p class="ap-hint mb-3">Assumed travel speed for each OSM highway type. Zero means impassable.</p>' +
-        '<div class="ap-road-grid">' + grid + "</div>"
+      "Road speeds",
+      "Global",
+      '<p class="ap-hint mb-3">Road speeds are shared by every scenario rather ' +
+        "than set per run.</p>" +
+        '<a href="global.html" class="btn btn-sm btn-outline-secondary">' +
+        '<i class="bi bi-signpost-split"></i> View global parameters</a>' +
+        stale
     );
   }
 

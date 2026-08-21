@@ -48,13 +48,16 @@
     });
   }
 
+  /* The index carries the scenarios and, alongside them, the settings that are
+     not a scenario's to vary - road speeds are shared across every run, so they
+     are published once and shown on their own page. */
   function loadCatalogue() {
     return fetchJson(CATALOGUE_URL).then(function (payload) {
       var scenarios = (payload && payload.scenarios) || [];
       if (!scenarios.length) {
         throw new Error("no scenarios are defined in " + CATALOGUE_URL);
       }
-      return scenarios;
+      return { scenarios: scenarios, global: (payload && payload.global) || {} };
     });
   }
 
@@ -184,6 +187,7 @@
       '<ul class="navbar-nav me-auto mb-0 gap-md-1">' +
       navLink("index.html", "Home", page) +
       navLink("scenarios.html", "Scenarios", page) +
+      navLink("global.html", "Global", page) +
       "</ul>" +
       '<ul class="navbar-nav ms-md-auto mb-0"><li class="nav-item dropdown">' +
       '<a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" ' +
@@ -233,11 +237,13 @@
      than over HTTP is the usual cause, so the message says so. */
   function boot(page, render) {
     loadCatalogue()
-      .then(function (scenarios) {
-        var active = resolveScenario(scenarios);
+      .then(function (catalogue) {
+        var active = resolveScenario(catalogue.scenarios);
         writeStored(active.id);
-        renderNav(page, scenarios, active);
-        return render ? render(active, scenarios) : undefined;
+        renderNav(page, catalogue.scenarios, active);
+        return render
+          ? render(active, catalogue.scenarios, catalogue.global)
+          : undefined;
       })
       .catch(function (error) {
         var hint =

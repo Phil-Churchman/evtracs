@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EV-TRACS">
+    <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
+
+    <title>Swap stations — EV-TRACS</title>
+
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@7.5.2/ol.css">
+    <link href="static/css/apple.css" rel="stylesheet">
+  </head>
+
+  <body id="body">
+    <div id="site-nav"></div>
+
+    <div class="ap-shell ap-shell-wide">
+      <header class="ap-page-head">
+        <p class="ap-eyebrow mb-2">
+          <a href="scenarios.html" class="ap-back"><i class="bi bi-chevron-left"></i> Scenarios</a>
+        </p>
+        <h1 id="scenarioName">Swap stations</h1>
+        <p class="ap-lead mt-2">
+          Where the battery swap stations are, and what was queueing at each one
+          through the simulated day. Click a station to play its queue back.
+        </p>
+      </header>
+
+      <div id="pageError" hidden></div>
+
+      <div class="card mb-3">
+        <div class="card-body ap-station-status">
+          <span id="areaStatus" class="ap-pill">Area: not loaded</span>
+          <span id="stationsStatus" class="ap-pill">Stations: not loaded</span>
+          <span id="logStatus" class="ap-pill">Queue log: not loaded</span>
+        </div>
+      </div>
+
+      <div class="card p-0 overflow-hidden">
+        <div id="map" class="ap-map" style="height: 68vh; min-height: 420px;"></div>
+      </div>
+    </div>
+
+    <!-- Per-station queue playback -->
+    <div class="modal fade" id="stationModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered ap-station-modal">
+        <div class="modal-content">
+          <div class="modal-header align-items-center">
+            <h5 class="modal-title mb-0" id="modalStationTitle">Station status</h5>
+            <span class="ap-pill ap-mono ms-auto me-2" id="modalClockDisplay">00:00:00</span>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close" id="closeModalBtn"></button>
+          </div>
+          <div class="modal-body">
+
+            <div class="ap-station-controls">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <button id="btnPlay" class="btn btn-primary btn-sm">Play</button>
+                <input type="range" class="form-range flex-grow-1" id="timeSlider" min="0" max="0" value="0">
+                <span id="stepDisplay" class="ap-pill ap-mono">0 / 0</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between gap-2">
+                <span class="form-label mb-0">Speed</span>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button class="btn btn-outline-secondary speed-btn" data-speed="1000">1x</button>
+                  <button class="btn btn-outline-secondary speed-btn active" data-speed="500">2x</button>
+                  <button class="btn btn-outline-secondary speed-btn" data-speed="200">5x</button>
+                  <button class="btn btn-outline-secondary speed-btn" data-speed="50">20x</button>
+                  <button class="btn btn-outline-secondary speed-btn" data-speed="5">200x</button>
+                </div>
+              </div>
+            </div>
+
+            <h6 class="mt-3">Battery swap posts</h6>
+            <div id="postsContainer" class="row g-2 mb-3"></div>
+
+            <h6>Queueing vehicles (<span id="queueCount">0</span>)</h6>
+            <div id="queueContainer" class="ap-queue-box"></div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="static/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol@7.5.2/dist/ol.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="static/js/app.js"></script>
+    <script src="static/js/station-animation.js"></script>
+    <script src="static/js/register-sw.js"></script>
+  </body>
+</html>

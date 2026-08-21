@@ -1,12 +1,139 @@
 {
+  "global": {
+    "road_speeds": "data/road_speeds.json",
+    "road_speeds_source": "Model/Simulation/road_speeds.json"
+  },
   "scenarios": [
+    {
+      "id": "accra",
+      "name": "Accra",
+      "parameters": "data/accra/parameters.json",
+      "area": "data/accra/area.geojson",
+      "area_source": "Imported from file",
+      "area_source_label": "Model_data/accra/geojson_files/area.geojson",
+      "swap_stations": "data/accra/swap_stations.geojson",
+      "taxi_ranks": "data/accra/taxi_ranks.geojson",
+      "animation": {
+        "mode": "hail_rank",
+        "agent_count": 100,
+        "agent_path": "data/accra/animation/agents/",
+        "station_log": "data/accra/animation/swap_station_timesteps.xlsx"
+      },
+      "outputs": [
+        {
+          "file": "data/accra/outputs/station_queues_analysis.png",
+          "title": "Station queues analysis",
+          "bytes": 630726
+        }
+      ],
+      "synced_from": "scenario_accra.json"
+    },
+    {
+      "id": "accra-okada",
+      "name": "Accra - Okada",
+      "parameters": "data/accra-okada/parameters.json",
+      "area": "data/accra-okada/area.geojson",
+      "area_source": "Imported from file",
+      "area_source_label": "Model_data/accra - okada/geojson_files/area.geojson",
+      "swap_stations": "data/accra-okada/swap_stations.geojson",
+      "taxi_ranks": "data/accra-okada/taxi_ranks.geojson",
+      "animation": {
+        "mode": "distribution",
+        "agent_count": 100,
+        "agent_path": "data/accra-okada/animation/agents/",
+        "station_log": "data/accra-okada/animation/swap_station_timesteps.xlsx"
+      },
+      "outputs": [
+        {
+          "file": "data/accra-okada/outputs/station_queues_analysis.png",
+          "title": "Station queues analysis",
+          "bytes": 694780
+        }
+      ],
+      "synced_from": "scenario_accra_okada.json"
+    },
+    {
+      "id": "bechem",
+      "name": "Bechem",
+      "parameters": "data/bechem/parameters.json",
+      "area": "data/bechem/area.geojson",
+      "area_source": "Imported from file",
+      "area_source_label": "Model_data/bechem/geojson_files/area.geojson",
+      "swap_stations": "data/bechem/swap_stations.geojson",
+      "taxi_ranks": null,
+      "animation": {
+        "mode": "demand_model",
+        "agent_count": 10,
+        "agent_path": "data/bechem/animation/agents/",
+        "station_log": "data/bechem/animation/swap_station_timesteps.xlsx"
+      },
+      "outputs": [
+        {
+          "file": "data/bechem/outputs/station_queues_analysis.png",
+          "title": "Station queues analysis",
+          "bytes": 71958
+        }
+      ],
+      "synced_from": "scenario_bechem.json"
+    },
     {
       "id": "nairobi",
       "name": "Nairobi",
       "parameters": "data/nairobi/parameters.json",
       "area": "data/nairobi/area.geojson",
       "area_source": "Imported from file",
-      "area_source_label": "area.geojson"
+      "area_source_label": "Model_data/nairobi/geojson_files/area.geojson",
+      "swap_stations": null,
+      "taxi_ranks": null,
+      "animation": {
+        "mode": "demand_model",
+        "agent_count": 10,
+        "agent_path": "data/nairobi/animation/agents/",
+        "station_log": null
+      },
+      "outputs": [
+        {
+          "file": "data/nairobi/outputs/distance_discrepancy_histogram.png",
+          "title": "Distance discrepancy histogram",
+          "bytes": 239979
+        },
+        {
+          "file": "data/nairobi/outputs/segment_chaining.png",
+          "title": "Segment chaining",
+          "bytes": 241282
+        },
+        {
+          "file": "data/nairobi/outputs/trip_distance_and_wait.png",
+          "title": "Trip distance and wait",
+          "bytes": 267751
+        },
+        {
+          "file": "data/nairobi/outputs/trip_distance_and_wait_cumulative.png",
+          "title": "Trip distance and wait cumulative",
+          "bytes": 266305
+        },
+        {
+          "file": "data/nairobi/outputs/trip_gap_analysis.png",
+          "title": "Trip gap analysis",
+          "bytes": 170400
+        },
+        {
+          "file": "data/nairobi/outputs/trip_gap_bin_best.png",
+          "title": "Trip gap bin best",
+          "bytes": 131395
+        },
+        {
+          "file": "data/nairobi/outputs/trip_gap_bin_search.png",
+          "title": "Trip gap bin search",
+          "bytes": 300107
+        },
+        {
+          "file": "data/nairobi/outputs/trip_gap_correlation.png",
+          "title": "Trip gap correlation",
+          "bytes": 216840
+        }
+      ],
+      "synced_from": "scenario_nairobi.json"
     },
     {
       "id": "test",
@@ -14,7 +141,10 @@
       "parameters": "data/test/parameters.json",
       "area": "data/test/area.geojson",
       "area_source": "Drawn on map",
-      "area_source_label": "Drawn on map"
+      "area_source_label": "Drawn on map",
+      "swap_stations": null,
+      "taxi_ranks": null,
+      "animation": null
     }
   ]
 }
