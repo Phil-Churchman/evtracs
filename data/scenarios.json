@@ -1,0 +1,20 @@
+{
+  "scenarios": [
+    {
+      "id": "nairobi",
+      "name": "Nairobi",
+      "parameters": "data/nairobi/parameters.json",
+      "area": "data/nairobi/area.geojson",
+      "area_source": "Imported from file",
+      "area_source_label": "area.geojson"
+    },
+    {
+      "id": "test",
+      "name": "Test",
+      "parameters": "data/test/parameters.json",
+      "area": "data/test/area.geojson",
+      "area_source": "Drawn on map",
+      "area_source_label": "Drawn on map"
+    }
+  ]
+}

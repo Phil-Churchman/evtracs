@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EV-TRACS">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
+
+    <title>EV-TRACS</title>
+
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="static/css/apple.css" rel="stylesheet">
+  </head>
+
+  <body id="body">
+    <div id="site-nav"></div>
+
+    <div class="ap-shell ap-shell-narrow">
+      <header class="ap-page-head">
+        <p class="ap-eyebrow mb-2">EV-TRACS</p>
+        <h1>Scenario data</h1>
+        <p class="ap-lead mt-2">
+          A read-only view of the published scenarios: their simulation
+          parameters and the geographic area each one covers.
+        </p>
+      </header>
+
+      <div id="pageError" hidden></div>
+
+      <section id="summary" class="mb-4"></section>
+
+      <div class="row g-3" id="tiles"></div>
+    </div>
+
+    <script src="static/js/bootstrap.bundle.js"></script>
+    <script src="static/js/app.js"></script>
+    <script src="static/js/home.js"></script>
+    <script src="static/js/register-sw.js"></script>
+  </body>
+</html>

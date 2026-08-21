@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EV-TRACS">
+    <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
+
+    <title>Parameters — EV-TRACS</title>
+
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="static/css/apple.css" rel="stylesheet">
+  </head>
+
+  <body id="body">
+    <div id="site-nav"></div>
+
+    <div class="ap-shell ap-shell-narrow">
+      <header class="ap-page-head">
+        <p class="ap-eyebrow mb-2">
+          <a href="scenarios.html" class="ap-back"><i class="bi bi-chevron-left"></i> Scenarios</a>
+        </p>
+        <h1 id="scenarioName">Parameters</h1>
+        <p class="ap-lead mt-2">
+          Simulation parameters for this scenario, as published in
+          <span class="ap-mono" id="sourceFile"></span>.
+        </p>
+      </header>
+
+      <div id="pageError" hidden></div>
+
+      <div id="parameters"></div>
+
+      <div class="ap-form-actions">
+        <a id="downloadLink" class="btn btn-primary" href="#" download>
+          <i class="bi bi-download"></i> Download parameters
+        </a>
+        <a href="scenarios.html" class="btn btn-secondary">Back</a>
+      </div>
+    </div>
+
+    <script src="static/js/bootstrap.bundle.js"></script>
+    <script src="static/js/app.js"></script>
+    <script src="static/js/parameters.js"></script>
+    <script src="static/js/register-sw.js"></script>
+  </body>
+</html>
