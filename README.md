@@ -117,11 +117,11 @@ but disabled, so every scenario's row reads the same.
 - `agent_path` — the folder holding them, trailing slash included.
 - `station_log` — the swap station timestep log, read by `stations.html`.
 
-This block describes the **run** whose output is published, which is not
-necessarily the same as the scenario's published `parameters.json`. Nairobi is
-the case in point: its parameters come from the web app, while its animation
-comes from a `demand_model` run driven by captured GPS trips, so the animation
-timeline starts in November 2023 rather than at the parameters' `start_time`.
+This block describes the **run** whose output is published, which need not line
+up with the scenario's `parameters.json`. Nairobi is the case in point: its
+`demand_model` run replays captured GPS trips, so the animation's timeline
+starts in November 2023 — when those trips were recorded — rather than at the
+`start_time` of January 2025 that the parameters give.
 
 ### `parameters.json`
 
@@ -208,7 +208,7 @@ a `Model/` and `Model_data/` checkout sitting alongside this one:
 ```bash
 python sync_evtracs.py              # sync, reporting what changed
 python sync_evtracs.py --dry-run    # say what would happen, change nothing
-python sync_evtracs.py --prune      # also delete data for dropped scenarios
+python sync_evtracs.py --no-prune   # leave dropped scenarios' data in place
 ```
 
 The script is deliberately **not** in the repository — `.gitignore` keeps it
@@ -247,26 +247,28 @@ shared table to `data/road_speeds.json` and points the `global` block at it. A
 `road_speeds.json` sitting in a scenario folder is reported and ignored, matching
 the model.
 
-### What the script will and will not touch
+### The model is the authority
 
-Entries it writes carry `synced_from`, naming the model scenario file they came
-from. On the next run:
+`data/` mirrors the flagged scenarios and holds nothing else. Every run rewrites
+`data/scenarios.json` from what it published, and **deletes any scenario folder
+it did not publish** — one whose flag was removed, one that was renamed, or one
+that was only ever added by hand. So `data/` cannot drift from the model, and
+there is no way to keep a scenario in the site that the model does not describe.
+Entries carry `synced_from` as a record of which model file each came from.
 
-- entries with `synced_from` are rewritten, or dropped if no longer flagged;
-- entries **without** it were written by hand and are left alone, unless a
-  synced scenario claims the same id, in which case the model wins;
-- data folders for dropped scenarios are reported, and deleted only with
-  `--prune`.
+Two things are deliberately spared:
+
+- **A scenario that is still flagged but could not be read** keeps its folder
+  and its index entry. A missing folder usually means a checkout that has not
+  finished syncing, which says nothing about whether the data is still wanted.
+  Any failure suppresses pruning for the whole run.
+- **A run that publishes nothing at all** leaves `data/` untouched and exits
+  non-zero, so pointing the script at a bad `Model/` cannot empty the site.
+
+`--no-prune` skips deletion entirely if you need it.
 
 Copies are skipped when the file is already there at the same size and time, so
 a re-run after one scenario changes does not rewrite tens of megabytes.
-
-## Adding a scenario by hand
-
-Scenarios that do not come from the model can still live in `data/`: add a
-folder, drop in a `parameters.json` and an `area.geojson`, and add an entry to
-`data/scenarios.json` **without** a `synced_from` key. The sync script will
-leave it alone.
 
 ## The outputs page
 
