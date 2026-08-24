@@ -485,6 +485,9 @@ picker writes back, so a particular workflow is linkable.
 
 - `setup` — steps every model type depends on and none of them owns. They are
   shown on the global page, not in any type's flow chart.
+- `parameters` — the scenario parameters, each with a label and a line on what
+  it controls. The "Set scenario parameters" step shows the ones its model type
+  reads, filtered by `parameter_use`.
 - `parameter_use` — the parameters only some model types read. See below.
 - `tools` — the standalone tools, keyed by id, each with the file it lives in
   and an icon.

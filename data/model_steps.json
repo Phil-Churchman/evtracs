@@ -82,11 +82,6 @@
       "file": "facilities.html",
       "icon": "bi-lightning-charge"
     },
-    "json-editor": {
-      "title": "JSON / GeoJSON editor",
-      "file": "tools/geojson_editor.html",
-      "icon": "bi-braces"
-    },
     "tracked-animation": {
       "title": "Tracked route animation",
       "file": "tools/clean_data_animation.html",
@@ -96,11 +91,6 @@
       "title": "GPS track & network viewer",
       "file": "tools/view_cleaned_data.html",
       "icon": "bi-graph-up"
-    },
-    "business-case": {
-      "title": "Business case dashboard",
-      "file": "tools/EV_3Wheeler_Business_Case_Dashboard.html",
-      "icon": "bi-cash-coin"
     },
     "tracking-overview": {
       "title": "Tracking data pipeline",
@@ -139,6 +129,64 @@
       "distribution"
     ]
   },
+  "parameters": {
+    "start_time": {
+      "label": "Start time",
+      "description": "When the simulated day begins."
+    },
+    "end_time": {
+      "label": "End time",
+      "description": "When it ends. The two together are the window the run covers."
+    },
+    "simulation_step_sec": {
+      "label": "Simulation step",
+      "description": "The clock tick. Waits and travel times are rounded up to a whole number of these."
+    },
+    "simulation_mode": {
+      "label": "Simulation mode",
+      "description": "Which of the model's modes the run uses, and so how trips are generated."
+    },
+    "speed_based_routing": {
+      "label": "Speed-based routing",
+      "description": "Route on travel time rather than on distance."
+    },
+    "agents": {
+      "label": "Agents introduced per period",
+      "description": "How many agents join the road in each period, so demand rises and falls across the day."
+    },
+    "animation_agents": {
+      "label": "Animation agents",
+      "description": "How many agents' trips are written out for the animation to play back."
+    },
+    "probability_hail": {
+      "label": "Probability of hailing",
+      "description": "The chance an agent takes a fare off the road rather than waiting at a taxi rank."
+    },
+    "max_total_distance_m": {
+      "label": "Max total distance",
+      "description": "How far an agent can travel on a charge before it has to swap."
+    },
+    "buffer_distance": {
+      "label": "Buffer distance",
+      "description": "Range held back in reserve, so a vehicle swaps before it strands. It also bounds how far from a station an agent can start."
+    },
+    "passenger_max_dist": {
+      "label": "Passenger max distance",
+      "description": "The furthest a fare-carrying trip can be."
+    },
+    "deviation_factor": {
+      "label": "Deviation factor",
+      "description": "The assumed ratio of road distance to straight-line distance, used to size the search for a destination."
+    },
+    "swap_wait_sec": {
+      "label": "Swap wait",
+      "description": "How long a battery swap takes."
+    },
+    "pickup_wait_sec": {
+      "label": "Pickup wait",
+      "description": "How long an agent waits at a pickup before the passenger trip starts."
+    }
+  },
   "shared": {
     "roads": {
       "title": "Extract the road network",
@@ -162,22 +210,15 @@
       ]
     },
     "configure": {
-      "title": "Configure the scenario",
+      "title": "Set scenario parameters",
       "description": "Set the simulation window, agent numbers, distances and routing options in the scenario file. This is what the Parameters page shows.",
       "video": "scenario-configuration",
-      "tools": [
-        "json-editor"
-      ]
+      "show_parameters": true
     },
     "simulate": {
       "title": "Run the simulation",
       "description": "Step the agents through the day: fares, pickups, passenger journeys and battery swaps, all routed over the road network.",
       "video": "simulation-approach"
-    },
-    "serve": {
-      "title": "Serve the output",
-      "description": "The viewers read the run's files over HTTP, so the output folder needs serving locally before the animations will load.",
-      "video": "live-server"
     },
     "animate": {
       "title": "Watch the trips",
@@ -192,10 +233,7 @@
     "analyse": {
       "title": "Read the analysis",
       "description": "Charts and tables summarising distances, waits, queues and station use across the run.",
-      "video": "analysis-outputs",
-      "tools": [
-        "business-case"
-      ]
+      "video": "analysis-outputs"
     }
   },
   "types": {
@@ -214,11 +252,11 @@
           "area",
           "roads",
           {
-            "title": "Add taxi ranks",
+            "title": "Place taxi ranks",
             "description": "Import the ranks where agents wait for fares. Agents pick between hailing on the road and queueing at a rank.",
             "video": "define-area",
             "tools": [
-              "json-editor"
+              "facilities"
             ]
           },
           "stations",
@@ -228,7 +266,6 @@
           "simulate"
         ],
         "view": [
-          "serve",
           "animate",
           "stationView"
         ],
@@ -276,7 +313,6 @@
           "simulate"
         ],
         "view": [
-          "serve",
           "animate",
           "stationView"
         ],
@@ -300,12 +336,9 @@
           "area",
           "roads",
           {
-            "title": "Measure trip distributions",
+            "title": "Define trip distributions",
             "description": "Derive the distance and waiting-time distributions from tracked trips. The simulation draws from these rather than from fixed demand points.",
-            "video": "vehicle-tracking",
-            "tools": [
-              "track-viewer"
-            ]
+            "video": "vehicle-tracking"
           },
           "stations",
           "configure"
@@ -314,11 +347,15 @@
           "simulate"
         ],
         "view": [
-          "serve",
           "animate",
           "stationView"
         ],
         "analyse": [
+          {
+            "title": "Compare against the target distributions",
+            "description": "Plot what the run actually produced against the distributions it was asked for - trip distance and fare wait, as both per-bin share and cumulative percentage. The simulation does not sample the target directly: it draws a distance band and then looks for a road node that far away, which can fail, and it refuses destinations that would leave a vehicle unable to reach a swap station. Every one of those is a place the realised distribution can drift from the target.",
+            "video": "analysis-outputs"
+          },
           "analyse"
         ]
       }
@@ -348,29 +385,39 @@
           "configure"
         ],
         "run": [
-          "simulate"
-        ],
-        "view": [
-          "serve",
-          "animate",
           {
-            "title": "Compare with the tracked routes",
-            "description": "Play the recorded journeys back the same way the simulated ones play, to see where the model and the real trips diverge.",
+            "title": "Chain segments into journeys",
+            "description": "Decide which consecutive segments are really one journey. For each pair the router is asked for the direct path from the first trip's start to the second's end and compares it with what the vehicle actually covered: a near-identical time means stopping there cost nothing and the two are one journey, while a detour means there was a real destination between them. The verdicts are then applied to produce a chained trip file, following runs of chained pairs so A-B-C collapses to one journey.",
             "video": "vehicle-tracking",
             "tools": [
-              "tracking-overview",
-              "tracked-animation"
+              "tracking-overview"
+            ]
+          },
+          {
+            "title": "Generate trip routes",
+            "description": "Snap each recorded trip's endpoints to the road network and route between them with the same weights the simulation uses, writing one file per vehicle in the format a simulation run produces. The timeline stays the recorded one: the routed hop times are rescaled to the duration actually observed, and the gaps between trips become idle points.",
+            "video": "vehicle-tracking",
+            "tools": [
+              "tracking-overview"
             ]
           }
+        ],
+        "view": [
+          "animate"
         ],
         "analyse": [
           {
             "title": "Check the fit",
-            "description": "Distance discrepancy, segment chaining and trip gap charts show how closely the simulated trips track the recorded ones.",
+            "description": "Distance discrepancy and segment chaining charts show how closely the routed trips track what the GPS logger actually recorded.",
             "video": "analysis-outputs",
             "tools": [
               "track-viewer"
             ]
+          },
+          {
+            "title": "Analyse idle gaps and trip length",
+            "description": "Split trips by how long the vehicle had been stationary beforehand - under a minute, up to ten, up to an hour, longer - and plot the trip distances in each band. A bin search finds which gap bands show the strongest association between consecutive idle gaps, and a correlation check asks whether the gap before a trip is related to the gap before the one prior to it.",
+            "video": "analysis-outputs"
           },
           {
             "title": "Calibrate road speeds",
@@ -388,6 +435,11 @@
               "tracking-overview",
               "track-viewer"
             ]
+          },
+          {
+            "title": "Measure the deviation factor",
+            "description": "Measure the ratio of road distance driven to straight-line distance between start and end. It is a property of the road network rather than of the fleet, so it has to be measured per city; trip distribution runs use it to turn a drawn road distance into the straight-line radius they search for a destination in.",
+            "video": "analysis-outputs"
           },
           "analyse"
         ]

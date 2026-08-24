@@ -14,6 +14,7 @@
   var STEPS_URL = "data/model_steps.json";
 
   var catalogue = null;
+  var currentType = "";     // the type on screen, which the list is filtered to
   var steps = [];          // the flattened steps currently on screen
   var modal = null;
 
@@ -73,6 +74,7 @@
   }
 
   function renderFlow(type) {
+    currentType = type;
     var spec = catalogue.types[type];
     var stages = catalogue.stages || [];
 
@@ -95,6 +97,29 @@
     document.getElementById("flow").innerHTML = '<div class="ap-flow">' + html + "</div>";
   }
 
+  /* The parameters the type on screen actually reads. `parameter_use` records
+     only the exceptions, so a parameter with no entry there is read by every
+     mode - which is most of them. */
+  function parameterList() {
+    var use = catalogue.parameter_use || {};
+    var defined = catalogue.parameters || {};
+
+    var rows = Object.keys(defined)
+      .filter(function (key) {
+        var users = use[key];
+        return !users || users.indexOf(currentType) !== -1;
+      })
+      .map(function (key) {
+        return (
+          "<div><dt>" + E.escapeHtml(defined[key].label || key) + "</dt>" +
+          "<dd>" + E.escapeHtml(defined[key].description || "") + "</dd></div>"
+        );
+      })
+      .join("");
+
+    return rows ? '<dl class="ap-param-list">' + rows + "</dl>" : "";
+  }
+
   // --- Step detail ----------------------------------------------------------
 
   function openStep(index) {
@@ -107,6 +132,8 @@
     document.getElementById("stepModalTitle").textContent = entry.step.title;
     document.getElementById("stepModalDescription").textContent =
       entry.step.description || "";
+    document.getElementById("stepModalParameters").innerHTML =
+      entry.step.show_parameters ? parameterList() : "";
 
     // A step that has a tool offers it here, so the modal is somewhere to act
     // from rather than only somewhere to read.

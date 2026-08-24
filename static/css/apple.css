@@ -1400,6 +1400,14 @@ a.ap-tile:hover .ap-tile-more i { transform: translateX(3px); }
 
 .ap-param-field { min-width: 0; }
 
+/* What the parameter controls, under its value. */
+.ap-param-about {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ap-ink-4);
+  margin: 0.375rem 0 0;
+}
+
 .ap-switch-row {
   display: flex;
   flex-wrap: wrap;
@@ -1573,6 +1581,21 @@ kbd {
 }
 
 .ap-summary dd.ap-mono { font-size: 0.75rem; font-weight: 400; }
+
+/* The parameter list in a step modal: the description carries the weight, so
+   the value column stacks under its term rather than sitting beside it. */
+.ap-param-list > div {
+  display: block;
+  padding: 0.5rem 0;
+}
+
+.ap-param-list dt { margin-bottom: 0.125rem; }
+
+.ap-param-list dd {
+  font-weight: 400;
+  color: var(--ap-ink-3);
+  text-align: left;
+}
 
 /* File inputs are hidden behind a label styled as a button. */
 label.btn { cursor: pointer; }
@@ -1947,51 +1970,6 @@ label.btn { cursor: pointer; }
   display: flex;
   flex-wrap: wrap;
   gap: 0.625rem;
-}
-
-/* Tools relevant to a stage on the scenario page. Deliberately lighter than the
-   tiles above them: these leave the site, and are a sidelong offer rather than
-   the main thing the stage is for. */
-.ap-stage-tools {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  padding-top: 0.25rem;
-}
-
-.ap-stage-tools-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ap-ink-4);
-  margin-right: 0.125rem;
-}
-
-.ap-stage-tool {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.3rem 0.7rem;
-  border: 1px solid var(--ap-hairline-strong);
-  border-radius: var(--ap-r-pill);
-  background: var(--ap-surface);
-  color: var(--ap-ink-2);
-  font-size: 0.8125rem;
-  text-decoration: none;
-  transition: border-color var(--ap-dur) var(--ap-ease),
-              color var(--ap-dur) var(--ap-ease);
-}
-
-.ap-stage-tool:hover {
-  border-color: var(--ap-blue);
-  color: var(--ap-blue);
-}
-
-.ap-stage-tool-out {
-  font-size: 0.6875rem;
-  opacity: 0.6;
 }
 
 /* -------------------------------------------------------------------------

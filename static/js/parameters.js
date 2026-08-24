@@ -18,6 +18,7 @@
   // read. Set once the catalogue loads; until then everything is shown.
   var mode = "";
   var parameterUse = {};
+  var parameterInfo = {};
 
   var MONTHS = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -69,12 +70,15 @@
     if (key && !applies(key)) {
       return "";
     }
+    var about = (parameterInfo[key] || {}).description;
     return (
       '<div class="ap-param-field"><span class="form-label d-block">' +
       E.escapeHtml(label) +
       '</span><div class="ap-value">' +
       E.escapeHtml(value) +
-      "</div></div>"
+      "</div>" +
+      (about ? '<p class="ap-param-about">' + E.escapeHtml(about) + "</p>" : "") +
+      "</div>"
     );
   }
 
@@ -131,10 +135,11 @@
       "Simulation",
       durationHours(parameters),
       '<div class="ap-param-cols">' +
-        field("Start time", formatParts(parameters.start_time)) +
-        field("End time", formatParts(parameters.end_time)) +
-        field("Simulation step", parameters.simulation_step_sec + " s") +
-        field("Simulation mode", simulationMode(parameters)) +
+        field("Start time", formatParts(parameters.start_time), "start_time") +
+        field("End time", formatParts(parameters.end_time), "end_time") +
+        field("Simulation step", parameters.simulation_step_sec + " s",
+              "simulation_step_sec") +
+        field("Simulation mode", simulationMode(parameters), "simulation_mode") +
         "</div>" +
         '<hr class="ap-hairline my-3">' +
         '<div class="ap-switch-row">' +
@@ -201,7 +206,7 @@
       "Agents",
       total.toLocaleString() + " in total",
       '<div class="ap-param-cols mb-4">' +
-        field("Animation agents", parameters.animation_agents) +
+        field("Animation agents", parameters.animation_agents, "animation_agents") +
         field("Probability of hailing", parameters.probability_hail,
               "probability_hail") +
         "</div>" +
@@ -217,12 +222,14 @@
       "Distances & routing",
       "",
       '<div class="ap-param-cols">' +
-        field("Max total distance", parameters.max_total_distance_m + " m") +
-        field("Buffer distance", parameters.buffer_distance + " m") +
+        field("Max total distance", parameters.max_total_distance_m + " m",
+              "max_total_distance_m") +
+        field("Buffer distance", parameters.buffer_distance + " m",
+              "buffer_distance") +
         field("Passenger max distance", parameters.passenger_max_dist + " m",
               "passenger_max_dist") +
-        field("Deviation factor", parameters.deviation_factor) +
-        field("Swap wait", parameters.swap_wait_sec + " s") +
+        field("Deviation factor", parameters.deviation_factor, "deviation_factor") +
+        field("Swap wait", parameters.swap_wait_sec + " s", "swap_wait_sec") +
         (parameters.pickup_wait_sec == null
           ? ""
           : field("Pickup wait", parameters.pickup_wait_sec + " s", "pickup_wait_sec")) +
@@ -276,6 +283,7 @@
     ]).then(function (loaded) {
       var parameters = loaded[0];
       parameterUse = (loaded[1] && loaded[1].parameter_use) || {};
+      parameterInfo = (loaded[1] && loaded[1].parameters) || {};
 
       document.getElementById("parameters").innerHTML =
         simulationCard(parameters) +

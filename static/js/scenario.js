@@ -170,25 +170,6 @@
       .join("");
   }
 
-  /* The editors that were tools are pages now, so the only one left to offer
-     alongside them is the general JSON/GeoJSON editor - useful against any of
-     the model's files, and belonging to none of them in particular. */
-  function extraTool(catalogue) {
-    var tool = (catalogue.tools || {})["json-editor"];
-    if (!tool) {
-      return "";
-    }
-    return (
-      '<div class="col-12"><div class="ap-stage-tools">' +
-      '<span class="ap-stage-tools-label">Also</span>' +
-      '<a class="ap-stage-tool" href="' + E.escapeHtml(tool.file) +
-      '" target="_blank" rel="noopener"><i class="bi ' + E.escapeHtml(tool.icon) +
-      '"></i>' + E.escapeHtml(tool.title) +
-      '<i class="bi bi-box-arrow-up-right ap-stage-tool-out"></i></a>' +
-      "</div></div>"
-    );
-  }
-
   function fact(label, value) {
     return "<div><dt>" + E.escapeHtml(label) + "</dt><dd>" +
            E.escapeHtml(value) + "</dd></div>";
@@ -238,7 +219,7 @@
 
       sections.innerHTML =
         section("define", "Define",
-                pagesForStage(scenario, wanted, "define") + extraTool(catalogue)) +
+                pagesForStage(scenario, wanted, "define")) +
         section("run", "Run", runCard(scenario)) +
         section("view", "View", pagesForStage(scenario, wanted, "view")) +
         section("analyse", "Analyse", pagesForStage(scenario, wanted, "analyse"));
