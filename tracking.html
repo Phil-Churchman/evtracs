@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EV-TRACS">
+    <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
+
+    <title>Tracking data — EV-TRACS</title>
+
+    <script>
+      // Set before paint so moving between pages never flashes the other theme.
+      try {
+        var savedTheme = localStorage.getItem("evtracs.theme");
+        if (savedTheme === "dark" || savedTheme === "light") {
+          document.documentElement.setAttribute("data-bs-theme", savedTheme);
+        }
+      } catch (e) {}
+    </script>
+
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="static/css/apple.css" rel="stylesheet">
+  </head>
+
+  <body id="body">
+    <div id="site-nav"></div>
+
+    <div class="ap-shell ap-shell-narrow">
+      <header class="ap-page-head">
+        <p class="ap-eyebrow mb-2">
+          <a href="tools.html" class="ap-back"><i class="bi bi-chevron-left"></i> Other tools</a>
+        </p>
+        <h1>Captured vehicle tracking</h1>
+        <p class="ap-lead mt-2">
+          How recorded GPS journeys are cleaned, matched onto the road network
+          and summarised — the data a calibration scenario is checked against.
+        </p>
+      </header>
+
+      <div id="pageError" hidden></div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-box-arrow-in-down text-body-secondary"></i>
+          <span class="card-title">What goes in</span>
+        </div>
+        <div class="card-body">
+          <dl class="ap-summary mb-3">
+            <div>
+              <dt>Recorded fixes</dt>
+              <dd><span class="ap-mono">device_locations.xlsx</span></dd>
+            </div>
+            <div>
+              <dt>Road network</dt>
+              <dd><span class="ap-mono">roads.graphml</span></dd>
+            </div>
+          </dl>
+          <p class="ap-hint mb-0">
+            The fixes come off the tracker app as timestamped latitude and
+            longitude, with an accuracy column if the export carries one. The
+            network is the same graph the simulation routes over, so a matched
+            journey and a simulated one are measured against the same roads.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between gap-2">
+          <span class="card-title d-flex align-items-center gap-2">
+            <i class="bi bi-list-ol text-body-secondary"></i> The cleaning pipeline
+          </span>
+          <span class="ap-eyebrow">9 stages</span>
+        </div>
+        <div class="card-body">
+          <ol class="ap-pipeline">
+            <li>
+              <h3>Load and screen the points</h3>
+              <p>Read the captured fixes in time order. Where the export has an
+                accuracy column it is used; where it does not, the later stages
+                do the filtering on their own.</p>
+            </li>
+            <li>
+              <h3>Find where the vehicle dwells</h3>
+              <p>Detect places the vehicle repeatedly sits still — a rank, a
+                home base, a lunch stop. Points within <strong>20 m</strong> of
+                each other group together, a group counts as a dwell once it
+                holds <strong>20 points inside 5 minutes</strong>, and centroids
+                within <strong>100 m</strong> merge into one location.</p>
+            </li>
+            <li>
+              <h3>Flag excursion loops</h3>
+              <p>Mark the points that leave a dwell and come back within
+                <strong>20 minutes</strong>. That is manoeuvring around a stop
+                rather than travelling, and left in it would read as a journey.</p>
+            </li>
+            <li>
+              <h3>Collapse the flagged runs</h3>
+              <p>Replace each continuous flagged sequence with a single
+                start-and-end pair, so an hour parked becomes two points rather
+                than several hundred.</p>
+            </li>
+            <li>
+              <h3>Match the points onto roads</h3>
+              <p>Build a spatial index over the network's edges and a drivable
+                subgraph, then walk the points in order, snapping each to a road
+                within <strong>20 m</strong>. Candidates are scored on distance
+                plus half their heading difference: footways and cycleways take
+                a <strong>+100</strong> penalty so the track stays on roads, and
+                staying on the edge already being followed earns
+                <strong>−10</strong>, which stops the match flickering between
+                parallel ways.</p>
+            </li>
+            <li>
+              <h3>Patch the route between fixes</h3>
+              <p>Route along the network between consecutive snapped points to
+                fill the gap, up to <strong>50 edges</strong> and
+                <strong>5 minutes</strong> apart. Past that the link is recorded
+                as invalid rather than a route being invented.</p>
+            </li>
+            <li>
+              <h3>Validate the speed</h3>
+              <p>Work out the speed implied by each matched hop and flag it when
+                it exceeds <strong>twice</strong> the speed limit for that
+                highway type — 50 km/h on residential, 130 on motorway, and so
+                on. Flagged hops keep their row but contribute no distance.</p>
+            </li>
+            <li>
+              <h3>Run it three times</h3>
+              <p>The matching repeats, each pass re-matching only the points that
+                matched on the last one. The route settles rather than being
+                dragged by fixes that were never going to match.</p>
+            </li>
+            <li>
+              <h3>Summarise each road used</h3>
+              <p>Count how many times every edge was traversed and work out its
+                average and maximum observed speed, writing all three back onto
+                the network that is exported.</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-box-arrow-up text-body-secondary"></i>
+          <span class="card-title">What comes out</span>
+        </div>
+        <div class="card-body">
+          <h3 class="ap-out-title"><span class="ap-mono">gps_noise_reduced.xlsx</span></h3>
+          <p>The cleaned points, each carrying its snapped position and speed,
+            the edge it matched to, the list of edges traversed to reach it, and
+            the two flags the later steps set — whether the route link was valid
+            and whether the speed was unrealistic.</p>
+
+          <h3 class="ap-out-title mt-4"><span class="ap-mono">matched_routes.graphml</span></h3>
+          <p class="mb-0">Just the part of the network the vehicle actually used,
+            each edge carrying its <span class="ap-mono">traversal_count</span>,
+            <span class="ap-mono">average_speed_kmh</span> and
+            <span class="ap-mono">max_speed_kmh</span>. This is what makes the
+            observed speeds comparable with the model's assumed ones.</p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between gap-2">
+          <span class="card-title d-flex align-items-center gap-2">
+            <i class="bi bi-play-circle text-body-secondary"></i> Seeing the result
+          </span>
+          <span class="ap-about-links">
+            <a class="btn btn-sm btn-outline-secondary"
+               href="tools/clean_data_animation.html" target="_blank" rel="noopener">
+              <i class="bi bi-play-circle"></i> Animation
+            </a>
+            <a class="btn btn-sm btn-outline-secondary"
+               href="tools/view_cleaned_data.html" target="_blank" rel="noopener">
+              <i class="bi bi-graph-up"></i> Track viewer
+            </a>
+          </span>
+        </div>
+        <div class="card-body">
+          <p>The tracked route animation takes those two files and replays the
+            journey along the matched road geometry rather than jumping between
+            raw fixes. Time is distributed along each patched route by distance,
+            so the vehicle moves at the speed the data implies.</p>
+          <p>Any stop longer than a minute is held for about half a second and
+            then skipped, with a banner while it holds — otherwise a day's
+            playback is mostly waiting. Hovering a road shows its average speed
+            and how many times it was driven.</p>
+          <p>It plays from 1× to 1200×, and steps point by point or an hour at
+            a time. The GPS track viewer beside it shows the same matched tracks
+            against the network without the playback.</p>
+          <p class="ap-hint mb-0">
+            The cleaning script and both viewers live in
+            <span class="ap-mono">Model/tracker_data_processing/</span>.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-arrow-right-circle text-body-secondary"></i>
+          <span class="card-title">Where it is used</span>
+        </div>
+        <div class="card-body">
+          <p>This is the input side of a <strong>calibration</strong> scenario.
+            The observed per-road speeds are compared against the simulated ones
+            and the assumed speeds adjusted until the two agree; the result
+            becomes the <a href="global.html">global road speed table</a> every
+            scenario then runs with.</p>
+          <p class="mb-0">The same tracked journeys also give the distance and
+            fare-wait distributions a
+            <span class="ap-mono">distribution</span> scenario draws from. The
+            <a href="overview.html?type=calibration">calibration workflow</a> puts
+            both in context.</p>
+        </div>
+      </div>
+
+      <div class="ap-form-actions">
+        <a id="trackingVideo" class="btn btn-primary" href="#"
+           target="_blank" rel="noopener" hidden>
+          <i class="bi bi-youtube"></i> Watch the walkthrough
+        </a>
+        <a href="tools.html" class="btn btn-secondary">Other tools</a>
+      </div>
+    </div>
+
+    <script src="static/js/bootstrap.bundle.js"></script>
+    <script src="static/js/app.js"></script>
+    <script src="static/js/tracking.js"></script>
+    <script src="static/js/register-sw.js"></script>
+  </body>
+</html>

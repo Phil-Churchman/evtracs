@@ -269,11 +269,11 @@
       '<div class="collapse navbar-collapse" id="navbarTopContent">' +
       '<ul class="navbar-nav me-auto mb-0 gap-md-1">' +
       navLink("index.html", "Home", page) +
-      navLink("scenario.html", "Scenario", page) +
       navLink("overview.html", "Overview", page) +
-      navLink("tools.html", "Tools", page) +
-      navLink("global.html", "Global", page) +
-      navLink("about.html", "About", page) +
+      navLink("selection.html", "Scenario selection", page) +
+      navLink("scenario.html", "Scenario", page) +
+      navLink("global.html", "Global params", page) +
+      navLink("tools.html", "Other tools", page) +
       "</ul>" +
       '<ul class="navbar-nav ms-md-auto mb-0"><li class="nav-item dropdown">' +
       '<a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" ' +
@@ -285,7 +285,7 @@
       '<li class="dropdown-header">Active scenario</li>' +
       switcherItems(scenarios, active) +
       '<li><hr class="dropdown-divider"></li>' +
-      '<li><a class="dropdown-item d-flex align-items-center gap-2" href="index.html">' +
+      '<li><a class="dropdown-item d-flex align-items-center gap-2" href="selection.html">' +
       '<i class="bi bi-collection"></i> All scenarios</a></li>' +
       "</ul></li></ul>" +
       '<ul class="navbar-nav mb-0"><li class="nav-item">' +

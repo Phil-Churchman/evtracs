@@ -19,7 +19,8 @@ Then open <http://127.0.0.1:8000/>.
 
 | Path                     | What it is                                          |
 | ------------------------ | --------------------------------------------------- |
-| `index.html`             | Home: the published scenarios; select one            |
+| `index.html`             | Home: the project, and the way in to the site        |
+| `selection.html`         | Scenario selection: the published scenarios          |
 | `scenario.html`          | One scenario at a glance, and the way in to it       |
 | `parameters.html`        | Read-only view of one scenario's parameters          |
 | `area.html`              | Map view of one scenario's area                      |
@@ -27,19 +28,20 @@ Then open <http://127.0.0.1:8000/>.
 | `frequencies.html`       | One scenario's demand frequencies                    |
 | `facilities.html`        | One scenario's swap stations and taxi ranks          |
 | `overview.html`          | How the model works, per model type                  |
+| `tracking.html`          | How captured GPS journeys are cleaned and matched    |
 | `global.html`            | Setup and parameters shared by every scenario        |
 | `animation.html`         | Agent trips played back over the area                |
 | `stations.html`          | Swap stations, and each one's queue through the day  |
 | `outputs.html`           | The charts a scenario's run produced                 |
-| `about.html`             | The project, the work package and the funding        |
-| `tools.html`             | Index of the model's standalone tools                |
+| `tools.html`             | Other tools: the standalone ones, and the pipeline   |
 | `tools/`                 | Those tools, copied from `Model/utilities`            |
 | `data/`                  | Everything the site displays                         |
 | `static/`                | CSS, icons, images and the page scripts              |
 
-Home lists the scenarios with the model type each one is; selecting
-a scenario opens `scenario.html`, which is the hub for its parameters, area,
-animations and outputs.
+Home describes the project and points at the two ways in: **Scenario
+selection**, which lists the published scenarios with the model type each one
+is, and the **Model overview**. Selecting a scenario opens `scenario.html`,
+the hub for its parameters, area, animations and outputs.
 
 Each page takes an optional `?scenario=<id>` parameter. Without one it uses the
 scenario this browser last selected, falling back to the first in the index.
@@ -167,8 +169,24 @@ the site without the sync script needing to know about it.
 hours: 24 values over a day are hourly, 8 are three-hourly. The parameters page
 works the labels out from the window rather than assuming.
 
-Road speeds are **not** here. They are calibrated once and applied to every
-run, so they live in `data/road_speeds.json` and are shown on `global.html`.
+The parameters page shows only what the scenario's model type actually reads.
+That comes from `parameter_use` in `model_steps.json`, which records **only the
+exceptions** — anything absent from it is read by every mode, which is most of
+them:
+
+| Parameter | Read by | Why |
+| --------- | ------- | --- |
+| `probability_hail` | `hail_rank` | Only that branch of `calculate_next_activity` chooses between hailing and a rank. |
+| `passenger_max_dist` | all but `distribution` | Distribution mode returns from `get_target_node` before reaching it, drawing distances from the measured bands instead. |
+| `pickup_wait_sec` | `distribution` | Only the distribution branch sets a pickup wait. |
+
+Calibration is a demand-model run, so it reads what `demand_model` reads. If the
+catalogue cannot be loaded the page shows everything rather than hiding
+something that matters.
+
+Road speeds are **not** here either. They are calibrated once and applied to
+every run, so they live in `data/road_speeds.json` and are shown on
+`global.html`.
 A scenario file that still carries its own `road_speed_km-h` has it dropped on
 export, and the parameters page says the table is being ignored — the model
 ignores it too.
@@ -317,6 +335,19 @@ Two things are deliberately spared:
 Copies are skipped when the file is already there at the same size and time, so
 a re-run after one scenario changes does not rewrite tens of megabytes.
 
+## The tracking data page
+
+`tracking.html` describes what `Model/tracker_data_processing/clean_data.py` does to recorded
+GPS journeys — the nine cleaning and map-matching stages, the thresholds each
+one uses, and the two files it writes — and what the tracked route animation
+then shows. It is static prose: the only thing wired up is the walkthrough link,
+which reads the vehicle tracking video out of `model_steps.json` so that url
+lives in one place.
+
+It is reached from the Other tools page and from the calibration steps in the
+overview. It is the input side of a calibration scenario, which is why it links
+on to the global road speed table and the calibration workflow.
+
 ## The tools
 
 `tools/` holds the model's standalone HTML utilities — the area setter, the
@@ -325,7 +356,19 @@ the tracked-route animation, the GPS track viewer and the business case
 dashboard. `tools.html` indexes them, grouped by the same Define / View /
 Analyse stages the overview uses.
 
-`sync_evtracs.py` refreshes them alongside the scenario data, so they cannot
+Tools are collected from `Model/utilities` and
+`Model/tracker_data_processing` — `TOOL_SOURCE_SUBDIRS` in the sync script lists
+them, so a further reshuffle is a one-line change. A tool appearing in both is
+reported rather than silently published twice.
+
+Four of the model's utilities are **not** published: the area, demand point,
+demand frequency and facilities editors, each superseded by a scenario-aware
+page in the site. Publishing both would leave two versions of the same editor
+differing in what they can do, so `SUPERSEDED_TOOLS` in the sync script skips
+them and the overview points at the site's version instead. Their full
+create-and-save counterparts remain in `Model/utilities`.
+
+`sync_evtracs.py` refreshes the rest alongside the scenario data, so they cannot
 drift from the model. They are copied from `Model/utilities` **unchanged** apart
 from two edits, both applied by the script:
 
@@ -379,7 +422,9 @@ muted one. Within that list, a tile is a link when the data exists and reads
 
 The scenario page offers one tool alongside these: the JSON/GeoJSON editor,
 which is useful against any of the model's files and belongs to none of them in
-particular. The full standalone editors stay on `tools.html`.
+particular. `tools.html` lists the tools that have no page of their own —
+the JSON/GeoJSON editor, the tracked route animation, the GPS track viewer and
+the business case dashboard.
 
 ## Theme
 
@@ -440,6 +485,7 @@ picker writes back, so a particular workflow is linkable.
 
 - `setup` — steps every model type depends on and none of them owns. They are
   shown on the global page, not in any type's flow chart.
+- `parameter_use` — the parameters only some model types read. See below.
 - `tools` — the standalone tools, keyed by id, each with the file it lives in
   and an icon.
 - `videos` — the walkthroughs, keyed by id. The urls are copied from

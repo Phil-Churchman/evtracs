@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-title" content="EV-TRACS">
     <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
 
-    <title>Parameters — EV-TRACS</title>
+    <title>Scenario selection — EV-TRACS</title>
 
     <script>
       // Set before paint so moving between pages never flashes the other theme.
@@ -33,32 +33,30 @@
 
     <div class="ap-shell ap-shell-narrow">
       <header class="ap-page-head">
-        <p class="ap-eyebrow mb-2">
-          <a href="scenario.html" class="ap-back"><i class="bi bi-chevron-left"></i> Scenario</a>
-        </p>
-        <h1 id="scenarioName">Parameters</h1>
+        <p class="ap-eyebrow mb-2">Electric Vehicle - Trip, Routing and Charging Simulator (EV-TRACS)</p>
+        <h1>Scenario selection</h1>
         <p class="ap-lead mt-2">
-          Simulation parameters for this scenario, as published in
-          <span class="ap-mono" id="sourceFile"></span>. Only the parameters
-          this scenario's model type reads are shown.
+          Select a scenario to explore its parameters, area, animations and
+          outputs.
         </p>
       </header>
 
       <div id="pageError" hidden></div>
 
-      <div id="parameters"></div>
-
-      <div class="ap-form-actions">
-        <a id="downloadLink" class="btn btn-primary" href="#" download>
-          <i class="bi bi-download"></i> Download parameters
-        </a>
-        <a href="scenario.html" class="btn btn-secondary">Back</a>
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between gap-2">
+          <span class="card-title d-flex align-items-center gap-2">
+            <i class="bi bi-collection text-body-secondary"></i> All scenarios
+          </span>
+          <span class="ap-eyebrow" id="scenarioCount"></span>
+        </div>
+        <ul class="list-group list-group-flush" id="scenarioList"></ul>
       </div>
     </div>
 
     <script src="static/js/bootstrap.bundle.js"></script>
     <script src="static/js/app.js"></script>
-    <script src="static/js/parameters.js"></script>
+    <script src="static/js/selection.js"></script>
     <script src="static/js/register-sw.js"></script>
   </body>
 </html>

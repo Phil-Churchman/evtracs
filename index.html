@@ -34,23 +34,142 @@
     <div class="ap-shell ap-shell-narrow">
       <header class="ap-page-head">
         <p class="ap-eyebrow mb-2">Electric Vehicle - Trip, Routing and Charging Simulator (EV-TRACS)</p>
-        <h1>Scenarios</h1>
+        <h1>Home</h1>
         <p class="ap-lead mt-2">
-          Select a scenario to explore its parameters, area, animations and
-          outputs.
+          The Electric Vehicle Trip, Routing and Charging Simulator, developed
+          as part of Work Package 4 of the Moving IMPACT project.
         </p>
       </header>
 
       <div id="pageError" hidden></div>
 
-      <div class="card">
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6">
+          <a class="ap-tile ap-card-hover text-decoration-none" href="selection.html">
+            <div class="ap-tile-icon"><i class="bi bi-collection"></i></div>
+            <h3>Scenario selection</h3>
+            <p>Example scenarios for each of four model types. Pick one to see
+              how the model works, with inputs, animations and outputs.</p>
+            <div class="ap-tile-more">Open <i class="bi bi-arrow-right"></i></div>
+          </a>
+        </div>
+        <div class="col-12 col-md-6">
+          <a class="ap-tile ap-card-hover text-decoration-none" href="overview.html">
+            <div class="ap-tile-icon is-green"><i class="bi bi-diagram-2"></i></div>
+            <h3>Model overview</h3>
+            <p>Step by step overview of how a scenario is built and run for each of four model
+              types — with links to walkthrough videos for each step.</p>
+            <div class="ap-tile-more">Open <i class="bi bi-arrow-right"></i></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-cpu text-body-secondary"></i>
+          <span class="card-title">EV-TRACS</span>
+        </div>
+        <div class="card-body">
+          <p>
+            EV-TRACS is a suite of software tools for defining, running, visualising and
+            analysing outputs of simulations of EV trips and charging or battery
+            swaps, using open source mapping and routing libraries.  It can be used for evaluating charging/swap station demand for the purpose of energy system and infrastructure sizing. 
+          </p>
+          <p class="mb-0">
+            This site presents inputs, animations and outputs for defined scenarios. 
+            However, to build and run new simulations, it is necessary to download the code 
+            and run this locally in a Python environment.  Video guides are provided to aid 
+            environment setup and installation of the downloaded code.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
         <div class="card-header d-flex align-items-center justify-content-between gap-2">
           <span class="card-title d-flex align-items-center gap-2">
-            <i class="bi bi-collection text-body-secondary"></i> All scenarios
+            <i class="bi bi-globe2 text-body-secondary"></i> Moving IMPACT project
           </span>
-          <span class="ap-eyebrow" id="scenarioCount"></span>
+          <a id="projectHeaderLink" class="btn btn-sm btn-outline-secondary"
+             href="#" target="_blank" rel="noopener">
+            <i class="bi bi-box-arrow-up-right"></i> Visit
+          </a>
         </div>
-        <ul class="list-group list-group-flush" id="scenarioList"></ul>
+        <div class="card-body">
+
+          <p>
+            Moving Impact is a collaboration between academic and industry partners in Ghana, 
+            Kenya, Rwanda and the UK led by Imperial College London 
+            that is exploring how mini-grids with EV charging infrastructure for 2- and 3-wheeler vehicles
+            can be integrated to support community needs, improve energy system access and resilience, 
+            and deliver socio-economic benefits.
+          </p>
+
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-diagram-3 text-body-secondary"></i>
+          <span class="card-title">Work Package 4</span>
+        </div>
+        <div class="card-body">
+          <p>
+            The Moving Impact project is divided into six work packages.
+            EV-TRACS has been developed as part of Work Package 4, which is led by the University of Leeds in 
+            collaboration with the University of Energy and Natural Resources in Ghana and the University of Rwanda.  
+          </p>
+          <p>
+            Work Package 4 considers policy, infrastructure and
+            business models required to support the electification of 2- and 3- 
+            wheelers including motorcycle taxis (okadas / boda-bodas), 3-wheeler 
+            taxis (pragyas / tuk-tuks) and utility vehicles (e.g. aboboyaas).  
+            It also considers the specific opportunity for 
+            health centres deploying mini grids to act as a local energy hub supporting EV charging and 
+            other energy demands as well as as meeting their own energy needs.
+          </p>
+          <p class="mb-0">
+            In addition to supporting analysis for Work Package 4, EV-TRACS simulations will provide EV energy demand 
+            inputs to analyses conducted by other work packages.
+          </p>
+        </div>
+      </div>
+
+
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-award text-body-secondary"></i>
+          <span class="card-title">Funding</span>
+        </div>
+        <div class="card-body">
+          <p class="ap-funding mb-0">
+            This work was supported by UK Research and Innovation through the
+            Ayrton Challenge Programme [Award reference UKRI314].
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-link-45deg text-body-secondary"></i>
+          <span class="card-title">Find out more</span>
+        </div>
+        <div class="card-body">
+          <div class="ap-about-links">
+            <a class="btn btn-primary" id="projectLink" href="#"
+               target="_blank" rel="noopener">
+              <i class="bi bi-box-arrow-up-right"></i> Moving IMPACT
+            </a>
+            <a class="btn btn-secondary"
+               href="https://github.com/Phil-Churchman/Model_WP4"
+               target="_blank" rel="noopener">
+              <i class="bi bi-github"></i> Source code
+            </a>
+            <a class="btn btn-secondary" href="mailto:p.d.churchman@leeds.ac.uk">
+              <i class="bi bi-envelope"></i> Contact
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 

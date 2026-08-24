@@ -12,6 +12,12 @@
   // Only used to spot a scenario file that still carries speeds of its own;
   // the table itself lives on the global parameters page.
   var ROAD_SPEED_KEY = "road_speed_km-h";
+  var STEPS_URL = "data/model_steps.json";
+
+  // Which model type this scenario is, and which parameters only some types
+  // read. Set once the catalogue loads; until then everything is shown.
+  var mode = "";
+  var parameterUse = {};
 
   var MONTHS = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -50,7 +56,19 @@
 
   // --- Building blocks ------------------------------------------------------
 
-  function field(label, value) {
+  /* A parameter with no entry in `parameter_use` is read by every mode, which
+     is most of them; only the exceptions are listed. A field for a parameter
+     this scenario's mode never reads is left out rather than shown as though it
+     mattered. */
+  function applies(key) {
+    var users = parameterUse[key];
+    return !users || users.indexOf(mode) !== -1;
+  }
+
+  function field(label, value, key) {
+    if (key && !applies(key)) {
+      return "";
+    }
     return (
       '<div class="ap-param-field"><span class="form-label d-block">' +
       E.escapeHtml(label) +
@@ -184,7 +202,8 @@
       total.toLocaleString() + " in total",
       '<div class="ap-param-cols mb-4">' +
         field("Animation agents", parameters.animation_agents) +
-        field("Probability of hailing", parameters.probability_hail) +
+        field("Probability of hailing", parameters.probability_hail,
+              "probability_hail") +
         "</div>" +
         '<span class="form-label d-block">Agents introduced per period</span>' +
         '<p class="ap-hint">' + hint + "</p>" +
@@ -200,9 +219,13 @@
       '<div class="ap-param-cols">' +
         field("Max total distance", parameters.max_total_distance_m + " m") +
         field("Buffer distance", parameters.buffer_distance + " m") +
-        field("Passenger max distance", parameters.passenger_max_dist + " m") +
+        field("Passenger max distance", parameters.passenger_max_dist + " m",
+              "passenger_max_dist") +
         field("Deviation factor", parameters.deviation_factor) +
         field("Swap wait", parameters.swap_wait_sec + " s") +
+        (parameters.pickup_wait_sec == null
+          ? ""
+          : field("Pickup wait", parameters.pickup_wait_sec + " s", "pickup_wait_sec")) +
         "</div>"
     );
   }
@@ -240,7 +263,20 @@
     link.href = scenario.parameters;
     link.setAttribute("download", E.slugify(scenario.name) + "-parameters.json");
 
-    return E.fetchJson(scenario.parameters).then(function (parameters) {
+    mode = scenario.mode;
+
+    return Promise.all([
+      E.fetchJson(scenario.parameters),
+      E.fetchJson(STEPS_URL).catch(function (error) {
+        // Without the catalogue nothing is filtered out, which shows a
+        // parameter too many rather than hiding one that matters.
+        console.warn("Could not load " + STEPS_URL, error);
+        return null;
+      })
+    ]).then(function (loaded) {
+      var parameters = loaded[0];
+      parameterUse = (loaded[1] && loaded[1].parameter_use) || {};
+
       document.getElementById("parameters").innerHTML =
         simulationCard(parameters) +
         agentsCard(parameters) +

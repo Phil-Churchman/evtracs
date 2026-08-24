@@ -1,5 +1,12 @@
 {
   "_comment": "Modelling steps per model type, for overview.html. Video ids index the videos table, whose urls come from instructions/video_catalogue/data.json.",
+  "setup": [
+    {
+      "title": "Set up the environment",
+      "description": "Install Python and the model's dependencies. Only needed once per machine, but everything downstream depends on it.",
+      "video": "python-environment"
+    }
+  ],
   "videos": {
     "python-environment": {
       "name": "Python environment setup",
@@ -57,22 +64,22 @@
   "tools": {
     "set-area": {
       "title": "Set area",
-      "file": "tools/set_area.html",
+      "file": "area.html",
       "icon": "bi-bounding-box"
     },
     "demand-points": {
       "title": "Demand points editor",
-      "file": "tools/edit_demand_points.html",
+      "file": "demand.html",
       "icon": "bi-geo-alt"
     },
     "demand-frequencies": {
       "title": "Demand frequency editor",
-      "file": "tools/edit_demand_frequencies.html",
+      "file": "frequencies.html",
       "icon": "bi-bar-chart-steps"
     },
     "facilities": {
       "title": "Facilities editor",
-      "file": "tools/edit_facility.html",
+      "file": "facilities.html",
       "icon": "bi-lightning-charge"
     },
     "json-editor": {
@@ -94,6 +101,11 @@
       "title": "Business case dashboard",
       "file": "tools/EV_3Wheeler_Business_Case_Dashboard.html",
       "icon": "bi-cash-coin"
+    },
+    "tracking-overview": {
+      "title": "Tracking data pipeline",
+      "file": "tracking.html",
+      "icon": "bi-signpost-2"
     }
   },
   "stages": [
@@ -114,6 +126,19 @@
       "label": "Analyse"
     }
   ],
+  "parameter_use": {
+    "probability_hail": [
+      "hail_rank"
+    ],
+    "passenger_max_dist": [
+      "hail_rank",
+      "demand_model",
+      "calibration"
+    ],
+    "pickup_wait_sec": [
+      "distribution"
+    ]
+  },
   "shared": {
     "roads": {
       "title": "Extract the road network",
@@ -173,13 +198,6 @@
       ]
     }
   },
-  "setup": [
-    {
-      "title": "Set up the environment",
-      "description": "Install Python and the model's dependencies. Only needed once per machine, but everything downstream depends on it.",
-      "video": "python-environment"
-    }
-  ],
   "types": {
     "hail_rank": {
       "summary": "Agents find passengers by travelling towards a nearby taxi rank, with a defined probability of being hailed en route versus after waiting at the taxi rank.  Passenger destinations within the scenarion area and within a defined maximum distance are randomly selected.",
@@ -322,6 +340,7 @@
             "description": "Load the recorded vehicle journeys, clean the GPS noise out of them, and map-match them onto the road network.",
             "video": "vehicle-tracking",
             "tools": [
+              "tracking-overview",
               "track-viewer",
               "tracked-animation"
             ]
@@ -339,6 +358,7 @@
             "description": "Play the recorded journeys back the same way the simulated ones play, to see where the model and the real trips diverge.",
             "video": "vehicle-tracking",
             "tools": [
+              "tracking-overview",
               "tracked-animation"
             ]
           }
@@ -355,13 +375,17 @@
           {
             "title": "Calibrate road speeds",
             "description": "Compare simulated journey times against the tracked ones and adjust the per-highway-type speeds until the two agree. The result becomes the global road speed table.",
-            "video": "vehicle-tracking"
+            "video": "vehicle-tracking",
+            "tools": [
+              "tracking-overview"
+            ]
           },
           {
             "title": "Calibrate trip distance and wait distributions",
             "description": "Fit the distance and fare-wait distributions to the tracked trips, so a run can draw journeys from measured behaviour rather than from fixed demand points. These are what a trip distribution scenario then uses.",
             "video": "vehicle-tracking",
             "tools": [
+              "tracking-overview",
               "track-viewer"
             ]
           },
