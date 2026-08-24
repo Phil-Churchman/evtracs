@@ -7,14 +7,16 @@
     {
       "id": "accra",
       "name": "Accra",
+      "mode": "hail_rank",
       "parameters": "data/accra/parameters.json",
       "area": "data/accra/area.geojson",
       "area_source": "Imported from file",
       "area_source_label": "Model_data/accra/geojson_files/area.geojson",
       "swap_stations": "data/accra/swap_stations.geojson",
       "taxi_ranks": "data/accra/taxi_ranks.geojson",
+      "demand_points": null,
+      "demand_frequencies": null,
       "animation": {
-        "mode": "hail_rank",
         "agent_count": 100,
         "agent_path": "data/accra/animation/agents/",
         "station_log": "data/accra/animation/swap_station_timesteps.xlsx"
@@ -31,14 +33,16 @@
     {
       "id": "accra-okada",
       "name": "Accra - Okada",
+      "mode": "distribution",
       "parameters": "data/accra-okada/parameters.json",
       "area": "data/accra-okada/area.geojson",
       "area_source": "Imported from file",
       "area_source_label": "Model_data/accra - okada/geojson_files/area.geojson",
       "swap_stations": "data/accra-okada/swap_stations.geojson",
       "taxi_ranks": "data/accra-okada/taxi_ranks.geojson",
+      "demand_points": null,
+      "demand_frequencies": null,
       "animation": {
-        "mode": "distribution",
         "agent_count": 100,
         "agent_path": "data/accra-okada/animation/agents/",
         "station_log": "data/accra-okada/animation/swap_station_timesteps.xlsx"
@@ -55,14 +59,16 @@
     {
       "id": "bechem",
       "name": "Bechem",
+      "mode": "demand_model",
       "parameters": "data/bechem/parameters.json",
       "area": "data/bechem/area.geojson",
       "area_source": "Imported from file",
       "area_source_label": "Model_data/bechem/geojson_files/area.geojson",
       "swap_stations": "data/bechem/swap_stations.geojson",
       "taxi_ranks": null,
+      "demand_points": "data/bechem/demand_points.geojson",
+      "demand_frequencies": "data/bechem/demand_frequencies.json",
       "animation": {
-        "mode": "demand_model",
         "agent_count": 10,
         "agent_path": "data/bechem/animation/agents/",
         "station_log": "data/bechem/animation/swap_station_timesteps.xlsx"
@@ -79,14 +85,16 @@
     {
       "id": "nairobi",
       "name": "Nairobi",
+      "mode": "calibration",
       "parameters": "data/nairobi/parameters.json",
       "area": "data/nairobi/area.geojson",
       "area_source": "Imported from file",
       "area_source_label": "Model_data/nairobi/geojson_files/area.geojson",
       "swap_stations": null,
       "taxi_ranks": null,
+      "demand_points": null,
+      "demand_frequencies": null,
       "animation": {
-        "mode": "demand_model",
         "agent_count": 10,
         "agent_path": "data/nairobi/animation/agents/",
         "station_log": null

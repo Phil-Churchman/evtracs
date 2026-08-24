@@ -1,0 +1,367 @@
+{
+  "_comment": "Modelling steps per model type, for overview.html. Video ids index the videos table, whose urls come from instructions/video_catalogue/data.json.",
+  "videos": {
+    "python-environment": {
+      "name": "Python environment setup",
+      "youtube": "https://www.youtube.com/embed/R8GsjhK11H8"
+    },
+    "osm-road-extractor": {
+      "name": "OSM road extractor",
+      "youtube": "https://www.youtube.com/embed/_PmB2dPRZmE"
+    },
+    "define-area": {
+      "name": "Define simulation area",
+      "youtube": "https://www.youtube.com/embed/9AGxTmrKMNA"
+    },
+    "demand-points": {
+      "name": "Demand point editor",
+      "youtube": "https://www.youtube.com/embed/kz7SuFsKKLE"
+    },
+    "demand-frequencies": {
+      "name": "Demand frequency editor",
+      "youtube": "https://www.youtube.com/embed/EkRGuvvLEy0"
+    },
+    "facility-location": {
+      "name": "Facility location optimisation",
+      "youtube": "https://www.youtube.com/embed/U3j083GNkC4"
+    },
+    "scenario-configuration": {
+      "name": "Scenario configuration",
+      "youtube": "https://www.youtube.com/embed/uE_YaF6HO2c"
+    },
+    "vehicle-tracking": {
+      "name": "Vehicle tracking data cleaning and analysis",
+      "youtube": "https://www.youtube.com/embed/MTm2I_XH6qU"
+    },
+    "simulation-approach": {
+      "name": "Simulation approach",
+      "youtube": "https://www.youtube.com/embed/jCDV0Hk6HIs"
+    },
+    "live-server": {
+      "name": "Run HTML as live server",
+      "youtube": "https://www.youtube.com/embed/lV6EwOchX0E"
+    },
+    "trip-animation": {
+      "name": "Simulation output animation",
+      "youtube": "https://www.youtube.com/embed/zBcY4n8fekA"
+    },
+    "station-animator": {
+      "name": "Swap / charge station animator",
+      "youtube": "https://www.youtube.com/embed/kA7fYmE312I"
+    },
+    "analysis-outputs": {
+      "name": "Analysis outputs",
+      "youtube": "https://www.youtube.com/embed/cb9IlU_1RAM"
+    }
+  },
+  "tools": {
+    "set-area": {
+      "title": "Set area",
+      "file": "tools/set_area.html",
+      "icon": "bi-bounding-box"
+    },
+    "demand-points": {
+      "title": "Demand points editor",
+      "file": "tools/edit_demand_points.html",
+      "icon": "bi-geo-alt"
+    },
+    "demand-frequencies": {
+      "title": "Demand frequency editor",
+      "file": "tools/edit_demand_frequencies.html",
+      "icon": "bi-bar-chart-steps"
+    },
+    "facilities": {
+      "title": "Facilities editor",
+      "file": "tools/edit_facility.html",
+      "icon": "bi-lightning-charge"
+    },
+    "json-editor": {
+      "title": "JSON / GeoJSON editor",
+      "file": "tools/geojson_editor.html",
+      "icon": "bi-braces"
+    },
+    "tracked-animation": {
+      "title": "Tracked route animation",
+      "file": "tools/clean_data_animation.html",
+      "icon": "bi-play-circle"
+    },
+    "track-viewer": {
+      "title": "GPS track & network viewer",
+      "file": "tools/view_cleaned_data.html",
+      "icon": "bi-graph-up"
+    },
+    "business-case": {
+      "title": "Business case dashboard",
+      "file": "tools/EV_3Wheeler_Business_Case_Dashboard.html",
+      "icon": "bi-cash-coin"
+    }
+  },
+  "stages": [
+    {
+      "id": "define",
+      "label": "Define"
+    },
+    {
+      "id": "run",
+      "label": "Run"
+    },
+    {
+      "id": "view",
+      "label": "View"
+    },
+    {
+      "id": "analyse",
+      "label": "Analyse"
+    }
+  ],
+  "shared": {
+    "environment": {
+      "title": "Set up the environment",
+      "description": "Install Python and the model's dependencies. Only needed once per machine, but everything downstream depends on it.",
+      "video": "python-environment"
+    },
+    "roads": {
+      "title": "Extract the road network",
+      "description": "Pull the road graph for the region out of OpenStreetMap. This becomes the network every agent routes over.",
+      "video": "osm-road-extractor"
+    },
+    "area": {
+      "title": "Define the area",
+      "description": "Draw or import the boundary the simulation covers. Trips are generated and routed inside it, with a buffer for journeys that stray outside.",
+      "video": "define-area",
+      "tools": [
+        "set-area"
+      ]
+    },
+    "stations": {
+      "title": "Place swap stations",
+      "description": "Choose where battery swap stations go, either by hand or by running the facility location optimisation over expected demand.",
+      "video": "facility-location",
+      "tools": [
+        "facilities"
+      ]
+    },
+    "configure": {
+      "title": "Configure the scenario",
+      "description": "Set the simulation window, agent numbers, distances and routing options in the scenario file. This is what the Parameters page shows.",
+      "video": "scenario-configuration",
+      "tools": [
+        "json-editor"
+      ]
+    },
+    "simulate": {
+      "title": "Run the simulation",
+      "description": "Step the agents through the day: fares, pickups, passenger journeys and battery swaps, all routed over the road network.",
+      "video": "simulation-approach"
+    },
+    "serve": {
+      "title": "Serve the output",
+      "description": "The viewers read the run's files over HTTP, so the output folder needs serving locally before the animations will load.",
+      "video": "live-server"
+    },
+    "animate": {
+      "title": "Watch the trips",
+      "description": "Play the whole fleet's day back over the map, with each agent coloured by what it is doing at that moment.",
+      "video": "trip-animation"
+    },
+    "stationView": {
+      "title": "Watch the swap stations",
+      "description": "Step through each station's posts and queue to see where vehicles waited and for how long.",
+      "video": "station-animator"
+    },
+    "analyse": {
+      "title": "Read the analysis",
+      "description": "Charts and tables summarising distances, waits, queues and station use across the run.",
+      "video": "analysis-outputs",
+      "tools": [
+        "business-case"
+      ]
+    }
+  },
+  "types": {
+    "hail_rank": {
+      "summary": "Agents alternate between hailing on the road or waiting at a taxi rank, and carrying a passenger to a nearby destination.",
+      "pages": [
+        "parameters",
+        "area",
+        "facilities",
+        "animation",
+        "stations",
+        "outputs"
+      ],
+      "steps": {
+        "define": [
+          "environment",
+          "roads",
+          "area",
+          {
+            "title": "Add taxi ranks",
+            "description": "Import the ranks where agents wait for fares. Agents pick between hailing on the road and queueing at a rank.",
+            "video": "define-area",
+            "tools": [
+              "json-editor"
+            ]
+          },
+          "stations",
+          "configure"
+        ],
+        "run": [
+          "simulate"
+        ],
+        "view": [
+          "serve",
+          "animate",
+          "stationView"
+        ],
+        "analyse": [
+          "analyse"
+        ]
+      }
+    },
+    "demand_model": {
+      "summary": "Trips are generated from demand points and frequencies, then allocated to the nearest idle agent.",
+      "pages": [
+        "parameters",
+        "area",
+        "demand",
+        "frequencies",
+        "facilities",
+        "animation",
+        "stations",
+        "outputs"
+      ],
+      "steps": {
+        "define": [
+          "environment",
+          "roads",
+          "area",
+          {
+            "title": "Place demand points",
+            "description": "Mark where trips start and end. The demand point editor puts them on the map and gives each one a weight.",
+            "video": "demand-points",
+            "tools": [
+              "demand-points"
+            ]
+          },
+          {
+            "title": "Set demand frequencies",
+            "description": "Say how often trips are generated at each point through the day, so demand rises and falls with the peaks.",
+            "video": "demand-frequencies",
+            "tools": [
+              "demand-frequencies"
+            ]
+          },
+          "stations",
+          "configure"
+        ],
+        "run": [
+          "simulate"
+        ],
+        "view": [
+          "serve",
+          "animate",
+          "stationView"
+        ],
+        "analyse": [
+          "analyse"
+        ]
+      }
+    },
+    "distribution": {
+      "summary": "Agents work a fare-wait / pickup / passenger cycle, with trip distances and fare waits drawn from measured distributions.",
+      "pages": [
+        "parameters",
+        "area",
+        "facilities",
+        "animation",
+        "stations",
+        "outputs"
+      ],
+      "steps": {
+        "define": [
+          "environment",
+          "roads",
+          "area",
+          {
+            "title": "Measure trip distributions",
+            "description": "Derive the distance and waiting-time distributions from tracked trips. The simulation draws from these rather than from fixed demand points.",
+            "video": "vehicle-tracking",
+            "tools": [
+              "track-viewer"
+            ]
+          },
+          "stations",
+          "configure"
+        ],
+        "run": [
+          "simulate"
+        ],
+        "view": [
+          "serve",
+          "animate",
+          "stationView"
+        ],
+        "analyse": [
+          "analyse"
+        ]
+      }
+    },
+    "calibration": {
+      "summary": "A run reproduced against real tracked journeys, so the road speeds and routing can be tuned until the model matches what actually happened.",
+      "pages": [
+        "parameters",
+        "area",
+        "animation",
+        "outputs"
+      ],
+      "steps": {
+        "define": [
+          "environment",
+          "roads",
+          "area",
+          {
+            "title": "Import tracked trips",
+            "description": "Load the recorded vehicle journeys, clean the GPS noise out of them, and map-match them onto the road network.",
+            "video": "vehicle-tracking",
+            "tools": [
+              "track-viewer",
+              "tracked-animation"
+            ]
+          },
+          "configure"
+        ],
+        "run": [
+          "simulate",
+          {
+            "title": "Fit road speeds",
+            "description": "Compare simulated journey times against the tracked ones and adjust the per-highway-type speeds until the two agree. The result becomes the global road speed table.",
+            "video": "vehicle-tracking"
+          }
+        ],
+        "view": [
+          "serve",
+          "animate",
+          {
+            "title": "Compare with the tracked routes",
+            "description": "Play the recorded journeys back the same way the simulated ones play, to see where the model and the real trips diverge.",
+            "video": "vehicle-tracking",
+            "tools": [
+              "tracked-animation"
+            ]
+          }
+        ],
+        "analyse": [
+          {
+            "title": "Check the fit",
+            "description": "Distance discrepancy, segment chaining and trip gap charts show how closely the simulated trips track the recorded ones.",
+            "video": "analysis-outputs",
+            "tools": [
+              "track-viewer"
+            ]
+          },
+          "analyse"
+        ]
+      }
+    }
+  }
+}

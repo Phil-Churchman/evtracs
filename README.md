@@ -19,21 +19,33 @@ Then open <http://127.0.0.1:8000/>.
 
 | Path                     | What it is                                          |
 | ------------------------ | --------------------------------------------------- |
-| `index.html`             | Home: the active scenario at a glance                |
-| `scenarios.html`         | The published scenarios; pick which one is active    |
+| `index.html`             | Home: the published scenarios; select one            |
+| `scenario.html`          | One scenario at a glance, and the way in to it       |
 | `parameters.html`        | Read-only view of one scenario's parameters          |
 | `area.html`              | Map view of one scenario's area                      |
+| `demand.html`            | One scenario's demand points                         |
+| `frequencies.html`       | One scenario's demand frequencies                    |
+| `facilities.html`        | One scenario's swap stations and taxi ranks          |
+| `overview.html`          | How the model works, per model type                  |
 | `global.html`            | Parameters shared by every scenario                  |
 | `animation.html`         | Agent trips played back over the area                |
 | `stations.html`          | Swap stations, and each one's queue through the day  |
 | `outputs.html`           | The charts a scenario's run produced                 |
+| `about.html`             | The project, the work package and the funding        |
+| `tools.html`             | Index of the model's standalone tools                |
+| `tools/`                 | Those tools, copied from `Model/utilities`            |
 | `data/`                  | Everything the site displays                         |
 | `static/`                | CSS, icons, images and the page scripts              |
+
+Home lists the scenarios with the model type each one is; selecting
+a scenario opens `scenario.html`, which is the hub for its parameters, area,
+animations and outputs.
 
 Each page takes an optional `?scenario=<id>` parameter. Without one it uses the
 scenario this browser last selected, falling back to the first in the index.
 The selection lives in `localStorage` and is per-browser — it is a view
-preference, not stored data.
+preference, not stored data. Because selecting is just a link, the detail pages
+can point plainly at `scenario.html` and land back on the right one.
 
 ## The data files
 
@@ -60,6 +72,7 @@ Each scenario entry looks like this:
 {
   "id": "nairobi",
   "name": "Nairobi",
+  "mode": "calibration",
   "parameters": "data/nairobi/parameters.json",
   "area": "data/nairobi/area.geojson",
   "area_source": "Imported from file",
@@ -67,7 +80,6 @@ Each scenario entry looks like this:
   "swap_stations": null,
   "taxi_ranks": null,
   "animation": {
-    "mode": "demand_model",
     "agent_count": 10,
     "agent_path": "data/nairobi/animation/agents/",
     "station_log": null
@@ -84,12 +96,16 @@ Each scenario entry looks like this:
 ```
 
 - `id` — used in URLs, so keep it short and URL-safe.
+- `mode` — the **model type**, shown on the home and scenario pages and used
+  by the animation to decide whether to draw taxi ranks. See below.
 - `parameters` — path to that scenario's parameters (required).
 - `area` — path to its area, or `null` if it has none.
 - `area_source` / `area_source_label` — where the area came from, shown as a
   label on the map page. Both are optional.
-- `swap_stations` / `taxi_ranks` — point geometry drawn on the animation and
-  station pages, or `null`.
+- `swap_stations` / `taxi_ranks` — point geometry drawn on the animation,
+  station and facilities pages, or `null`.
+- `demand_points` / `demand_frequencies` — the demand model's inputs, or
+  `null`. Only a demand model scenario has them.
 - `animation` — the published animation run, or `null`. See below.
 - `outputs` — the run's charts, or `[]`. `title` is derived from the filename
   and `bytes` is shown beside it in the picker.
@@ -101,16 +117,12 @@ but disabled, so every scenario's row reads the same.
 
 ```json
 {
-  "mode": "distribution",
   "agent_count": 100,
   "agent_path": "data/accra-okada/animation/agents/",
   "station_log": "data/accra-okada/animation/swap_station_timesteps.xlsx"
 }
 ```
 
-- `mode` — one of `hail_rank`, `demand_model`, `distribution`. Only `hail_rank`
-  puts pickups at taxi ranks, so only that mode draws the rank layer and its
-  legend entries.
 - `agent_count` — how many `agent_NNNN_time.geojson` files were published. This
   is the run's `animation_agents`; the model writes one file per simulated
   agent, but the animation only ever reads this many, so only this many ship.
@@ -126,8 +138,8 @@ starts in November 2023 — when those trips were recorded — rather than at th
 ### `parameters.json`
 
 The same shape the simulation model reads (`Model/scenario_<name>.json`), minus
-the keys that steer the model rather than describe the run — `folder_name`,
-`sync_evtracs`, `evtracs_name`. Times are
+the keys that steer the model or this site rather than describe the run —
+`folder_name`, `sync_evtracs`, `evtracs_name`, `evtracs_model_type`. Times are
 `[year, month, day, hour, minute, second]`:
 
 ```json
@@ -178,10 +190,36 @@ any extra ones the file defines.
 A plain GeoJSON `FeatureCollection` of polygons in EPSG:4326, the projection
 GeoJSON requires and what OpenStreetMap exports use.
 
-### `simulation_mode`
+### Model types
 
-The mode used to be a `demand_model` boolean. Files written before that change
-are still read the old way, so both spellings work.
+The site knows four:
+
+| Type | Meaning |
+| ---- | ------- |
+| `hail_rank` | Agents hail on the road or wait at a taxi rank. |
+| `demand_model` | Trips are generated from demand points and frequencies. |
+| `distribution` | Trip distances and fare waits are drawn from measured distributions. |
+| `calibration` | A run reproduced against real tracked journeys, to tune road speeds and routing. |
+
+The first three are the model's own `simulation_mode`. **`calibration` is the
+site's own** — the model has only three modes and would refuse to start on a
+fourth, so a scenario asks for it with a key the model ignores:
+
+```json
+{
+  "sync_evtracs": true,
+  "evtracs_model_type": "calibration",
+  "simulation_mode": "demand_model"
+}
+```
+
+Nairobi is the case in point: the model runs it in `demand_model` mode, but it
+exists to be checked against tracked trips, so that is what the site calls it.
+The Parameters page still reports the file's own `simulation_mode`, which is why
+it says "Demand model" where the rest of the site says "Calibration".
+
+`simulation_mode` itself used to be a `demand_model` boolean. Files written
+before that change are still read the old way, so both spellings work.
 
 ### Where the data came from
 
@@ -197,6 +235,9 @@ are still read the old way, so both spellings work.
 | `<id>/animation/agents/`                  | `Model_data/<folder>/output/output_trips_time_queued/`        |
 | `<id>/animation/swap_station_timesteps.xlsx` | `Model_data/<folder>/output/`                              |
 | `<id>/outputs/*.png`                      | `Model_data/<folder>/output/*.png`                            |
+
+`data/model_steps.json` is the exception: it is written by hand, not synced. The
+prune only removes directories, so it is safe there.
 
 `sync_evtracs.py` does the copying — see below.
 
@@ -269,6 +310,148 @@ Two things are deliberately spared:
 
 Copies are skipped when the file is already there at the same size and time, so
 a re-run after one scenario changes does not rewrite tens of megabytes.
+
+## The tools
+
+`tools/` holds the model's standalone HTML utilities — the area setter, the
+demand point and frequency editors, the facilities editor, the GeoJSON editor,
+the tracked-route animation, the GPS track viewer and the business case
+dashboard. `tools.html` indexes them, grouped by the same Define / View /
+Analyse stages the overview uses.
+
+`sync_evtracs.py` refreshes them alongside the scenario data, so they cannot
+drift from the model. They are copied from `Model/utilities` **unchanged** apart
+from two edits, both applied by the script:
+
+- `../web/css/apple.css` becomes `../static/css/apple.css`, the only local asset
+  any of them referenced;
+- a copy of the theme script, so a viewer who picked dark on the site gets dark
+  tools.
+
+Nothing else was touched, and nothing needed to be: each tool already works
+entirely in the browser, taking a file you open from your own machine and
+exporting what it produces. None of them talks to a model server — the only
+network call in the set is `set_area.html` querying Overpass, which the site's
+own area page does too. They read only CSS custom properties from `apple.css`,
+no component classes, so the site's styling changes cannot break them.
+
+`tools/` mirrors `Model/utilities/*.html` the same way `data/` mirrors the
+flagged scenarios: a tool the model no longer has is deleted, unless you pass
+`--no-prune`. A filename with a space in it is published with underscores, since
+a space would need escaping in every URL. If a tool ever stops referencing
+`apple.css`, or still points into the model's own `web/` folder after the
+rewrite, the run says so rather than quietly publishing something that will
+404.
+
+## The scenario data pages
+
+`area.html`, `demand.html`, `frequencies.html` and `facilities.html` all work
+the same way, and `static/js/file-panel.js` is the wiring they share: the
+scenario's published file is what you arrive at, you can open a different one
+from your own machine to compare, and you can export whatever is on screen.
+Nothing is written back, so **Back to published** always returns to the file the
+model produced. A page whose scenario published nothing says so and still lets
+you open a file.
+
+Each page supplies four things to the panel — how to parse a file, how to draw
+it, how to summarise it, and how to serialise it for export — and the panel
+handles the rest.
+
+### Which pages a scenario shows
+
+From its model type's `pages` list in `model_steps.json`. A hail-and-rank run
+has no demand points, so it is not shown a tile for them at all — not even a
+muted one. Within that list, a tile is a link when the data exists and reads
+"Not published" when it does not.
+
+| Model type | Pages |
+| ---------- | ----- |
+| Hail and taxi rank | parameters, area, facilities, animation, stations, outputs |
+| Demand model | + demand, frequencies |
+| Trip distribution | parameters, area, facilities, animation, stations, outputs |
+| Calibration | parameters, area, animation, outputs |
+
+The scenario page offers one tool alongside these: the JSON/GeoJSON editor,
+which is useful against any of the model's files and belongs to none of them in
+particular. The full standalone editors stay on `tools.html`.
+
+## Theme
+
+The stylesheet reads light by default, dark under `prefers-color-scheme`, and
+either one under `data-bs-theme` on `<html>`, which wins. So no stored choice
+means "follow the system", and the toggle in the navbar pins whichever theme the
+viewer is not currently looking at. The choice lives in `localStorage` under
+`evtracs.theme`.
+
+Each page carries a small inline script in its `<head>` that applies the stored
+choice before first paint. It has to be inline and early: waiting for `app.js`
+would render every page in one theme and repaint it in the other.
+
+## Branding
+
+The navbar brand is two links, not one — the Moving IMPACT mark goes to the
+project site, the EV-TRACS wordmark goes home. Merging them would cost one or
+the other. The project URL lives once in `app.js` as `MOVING_IMPACT_URL` and is
+reused by the About page, so the logo and the button cannot drift apart.
+
+## The overview page
+
+`overview.html` explains the modelling workflow rather than any one scenario.
+Pick a model type and it draws the steps as a flow chart, in the same four
+stages the scenario page uses — Define, Run, View, Analyse. Choosing a step
+opens its description and a link to the walkthrough video.
+
+It opens on the active scenario's own model type, so arriving from a scenario
+shows the workflow that produced it; `?type=<id>` overrides that and is what the
+picker writes back, so a particular workflow is linkable.
+
+### `model_steps.json`
+
+```json
+{
+  "videos": {
+    "trip-animation": {
+      "name": "Simulation output animation",
+      "youtube": "https://www.youtube.com/embed/zBcY4n8fekA"
+    }
+  },
+  "stages": [{ "id": "define", "label": "Define" }],
+  "shared": {
+    "roads": {
+      "title": "Extract the road network",
+      "description": "…",
+      "video": "osm-road-extractor"
+    }
+  },
+  "types": {
+    "calibration": {
+      "summary": "…",
+      "steps": { "define": ["roads", { "title": "…", "video": "…" }] }
+    }
+  }
+}
+```
+
+- `tools` — the standalone tools, keyed by id, each with the file it lives in
+  and an icon.
+- `videos` — the walkthroughs, keyed by id. The urls are copied from
+  `instructions/video_catalogue/data.json` and kept in its `/embed/` form; the
+  page rewrites them to `/watch?v=` for the link, so the button opens the real
+  YouTube page rather than a bare player.
+- `shared` — steps common to several model types, referenced by name.
+- `types` — each type's `summary` and its steps per stage. A step is either the
+  name of a shared step or an object spelling one out, which is how a type says
+  what it does differently.
+
+A step may also carry `"tools": ["set-area"]`, naming ids from the `tools`
+table. Those become buttons in the step's modal, and they are what the scenario
+page shows under each stage — so which tools a scenario offers follows from its
+model type, and the flow chart and the scenario page cannot disagree about which
+ones matter. Nairobi gets the GPS track viewer and no facilities editor;
+Bechem gets the demand point and frequency editors instead.
+
+A step with no `video` still opens; the modal says there is no walkthrough yet
+rather than offering a dead button.
 
 ## The outputs page
 

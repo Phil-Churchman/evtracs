@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-title" content="EV-TRACS">
     <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
 
-    <title>Outputs — EV-TRACS</title>
+    <title>Demand frequencies — EV-TRACS</title>
 
     <script>
       // Set before paint so moving between pages never flashes the other theme.
@@ -36,49 +36,67 @@
         <p class="ap-eyebrow mb-2">
           <a href="scenario.html" class="ap-back"><i class="bi bi-chevron-left"></i> Scenario</a>
         </p>
-        <h1 id="scenarioName">Outputs</h1>
-        <p class="ap-lead mt-2">
-          Charts this scenario's run produced. Pick one to view it.
-        </p>
+        <h1 id="scenarioName">Demand frequencies</h1>
+        <p class="ap-lead mt-2">How often trips are generated between each pair of places, through the day and across the week.</p>
       </header>
 
       <div id="pageError" hidden></div>
 
-      <div class="row g-3 g-lg-4" id="layout" hidden>
+      <div class="row g-3 g-lg-4">
         <div class="col-12 col-lg-4">
           <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between gap-2">
               <span class="card-title d-flex align-items-center gap-2">
-                <i class="bi bi-images text-body-secondary"></i> Charts
+                <i class="bi bi-bar-chart-steps text-body-secondary"></i> Frequencies
               </span>
-              <span class="ap-eyebrow" id="outputCount"></span>
+              <span class="ap-pill" id="panelOrigin" hidden></span>
             </div>
-            <ul class="list-group list-group-flush" id="outputList"></ul>
+            <div class="card-body">
+
+              <div id="panelSummary"></div>
+
+              <div class="d-grid gap-2">
+                <label class="btn btn-sm btn-outline-secondary mb-0" for="panelFile">
+                  <i class="bi bi-upload"></i> Open a file
+                </label>
+                <input type="file" id="panelFile" accept=".json" hidden>
+
+                <button type="button" id="panelExport" class="btn btn-primary" disabled>
+                  <i class="bi bi-download"></i> Export
+                </button>
+                <button type="button" id="panelReset" class="btn btn-secondary" disabled>
+                  <i class="bi bi-arrow-counterclockwise"></i> Back to published
+                </button>
+              </div>
+
+              <div id="panelStatus" class="ap-hint mt-3 mb-0" role="status" aria-live="polite"></div>
+
+              <p class="ap-hint mt-2 mb-0">
+                <i class="bi bi-info-circle"></i>
+                This site is read-only. Export anything you want to keep.
+              </p>
+            </div>
           </div>
         </div>
 
         <div class="col-12 col-lg-8">
           <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between gap-2">
-              <span class="card-title" id="viewerTitle">Select a chart</span>
-              <a id="fullSizeLink" class="btn btn-sm btn-outline-secondary" href="#"
-                 target="_blank" rel="noopener" hidden>
-                <i class="bi bi-arrows-fullscreen"></i> Full size
-              </a>
+              <span class="card-title">Flows</span>
+              <span class="ap-eyebrow" id="flowCount"></span>
             </div>
             <div class="card-body">
-              <div class="ap-chart-frame" id="viewer"></div>
+              <div id="flows"></div>
             </div>
           </div>
         </div>
       </div>
-
-      <div id="empty" hidden></div>
     </div>
 
     <script src="static/js/bootstrap.bundle.js"></script>
     <script src="static/js/app.js"></script>
-    <script src="static/js/outputs.js"></script>
+    <script src="static/js/file-panel.js"></script>
+    <script src="static/js/frequencies.js"></script>
     <script src="static/js/register-sw.js"></script>
   </body>
 </html>

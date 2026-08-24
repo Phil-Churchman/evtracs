@@ -100,17 +100,11 @@
 
   // The mode used to be a "demand_model" boolean; it is now a named mode, and
   // files written before the change are still read the old way.
-  var MODE_LABELS = {
-    hail_rank: "Hail and taxi rank",
-    demand_model: "Demand model",
-    distribution: "Trip distribution"
-  };
-
   function simulationMode(parameters) {
-    var mode =
+    return E.modeLabel(
       parameters.simulation_mode ||
-      (parameters.demand_model ? "demand_model" : "hail_rank");
-    return MODE_LABELS[mode] || mode;
+        (parameters.demand_model ? "demand_model" : "hail_rank")
+    );
   }
 
   function simulationCard(parameters) {
@@ -122,7 +116,7 @@
         field("Start time", formatParts(parameters.start_time)) +
         field("End time", formatParts(parameters.end_time)) +
         field("Simulation step", parameters.simulation_step_sec + " s") +
-        field("Mode", simulationMode(parameters)) +
+        field("Simulation mode", simulationMode(parameters)) +
         "</div>" +
         '<hr class="ap-hairline my-3">' +
         '<div class="ap-switch-row">' +

@@ -13,6 +13,9 @@
   "use strict";
 
   var CATALOGUE_URL = "data/scenarios.json";
+
+  // The project EV-TRACS was built for; linked from the logo and the About page.
+  var MOVING_IMPACT_URL = "https://movingimpactproject.org/";
   var ACTIVE_KEY = "evtracs.activeScenario";
 
   // --- Storage --------------------------------------------------------------
@@ -108,6 +111,21 @@
     return page + "?scenario=" + encodeURIComponent(id);
   }
 
+  /* The model types in words, shared by the home, scenario and overview pages.
+     The first three are the model's own simulation modes; "calibration" is the
+     site's own, for a scenario that exists to be checked against tracked trips
+     rather than to forecast. */
+  var MODE_LABELS = {
+    hail_rank: "Hail and taxi rank",
+    demand_model: "Demand model",
+    distribution: "Trip distribution",
+    calibration: "Calibration"
+  };
+
+  function modeLabel(mode) {
+    return MODE_LABELS[mode] || mode || "Unknown";
+  }
+
   function download(filename, text, mimeType) {
     var blob = new Blob([text], { type: mimeType || "application/json" });
     var url = URL.createObjectURL(blob);
@@ -130,6 +148,66 @@
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
     return slug || "scenario";
+  }
+
+
+  // --- Theme ----------------------------------------------------------------
+  //
+  // Three states, two of them explicit: the stylesheet reads light by default,
+  // dark under prefers-color-scheme, and either one under data-bs-theme, which
+  // wins. So "no stored choice" means follow the system, and the toggle simply
+  // pins whichever one the viewer is not currently looking at.
+
+  var THEME_KEY = "evtracs.theme";
+
+  function storedTheme() {
+    try {
+      return window.localStorage.getItem(THEME_KEY) || "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function systemPrefersDark() {
+    return Boolean(window.matchMedia &&
+                   window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+
+  /* What is actually on screen right now. */
+  function effectiveTheme() {
+    var stored = storedTheme();
+    if (stored === "dark" || stored === "light") {
+      return stored;
+    }
+    return systemPrefersDark() ? "dark" : "light";
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-bs-theme", theme);
+    try {
+      window.localStorage.setItem(THEME_KEY, theme);
+    } catch (error) {
+      /* The theme still applies for this page; it just is not remembered. */
+    }
+    refreshThemeToggle();
+  }
+
+  /* The button shows the theme it will switch *to*, so the icon reads as an
+     action rather than as a status light. */
+  function refreshThemeToggle() {
+    var button = document.getElementById("themeToggle");
+    if (!button) {
+      return;
+    }
+    var next = effectiveTheme() === "dark" ? "light" : "dark";
+    button.innerHTML =
+      '<i class="bi bi-' + (next === "dark" ? "moon-stars" : "sun") + '"></i>';
+    button.title = "Switch to " + next + " theme";
+    button.setAttribute("aria-label", button.title);
+  }
+
+  function toggleTheme() {
+    applyTheme(effectiveTheme() === "dark" ? "light" : "dark");
   }
 
   // --- Navigation -----------------------------------------------------------
@@ -177,8 +255,13 @@
     host.innerHTML =
       '<nav class="navbar navbar-expand-md sticky-top ap-nav" id="top_nav">' +
       '<div class="container-fluid px-3 px-md-4">' +
-      '<a class="navbar-brand" id="master_brand" href="index.html">' +
-      '<img src="static/images/icon-160x160.png" alt=""><span>EV-TRACS</span></a>' +
+      // Two links, not one: the mark goes to the project it was built for, the
+      // wordmark goes home. Merging them would cost one or the other.
+      '<span class="navbar-brand" id="master_brand">' +
+      '<a href="' + MOVING_IMPACT_URL + '" target="_blank" rel="noopener" ' +
+      'title="Moving IMPACT project"><img src="static/images/moving-impact-logo.png" ' +
+      'alt="Moving IMPACT"></a>' +
+      '<a href="index.html" class="ap-brand-name">EV-TRACS</a></span>' +
       '<button class="navbar-toggler" type="button" data-bs-toggle="collapse" ' +
       'data-bs-target="#navbarTopContent" aria-controls="navbarTopContent" ' +
       'aria-expanded="false" aria-label="Toggle navigation">' +
@@ -186,8 +269,11 @@
       '<div class="collapse navbar-collapse" id="navbarTopContent">' +
       '<ul class="navbar-nav me-auto mb-0 gap-md-1">' +
       navLink("index.html", "Home", page) +
-      navLink("scenarios.html", "Scenarios", page) +
+      navLink("scenario.html", "Scenario", page) +
+      navLink("overview.html", "Overview", page) +
+      navLink("tools.html", "Tools", page) +
       navLink("global.html", "Global", page) +
+      navLink("about.html", "About", page) +
       "</ul>" +
       '<ul class="navbar-nav ms-md-auto mb-0"><li class="nav-item dropdown">' +
       '<a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" ' +
@@ -199,9 +285,16 @@
       '<li class="dropdown-header">Active scenario</li>' +
       switcherItems(scenarios, active) +
       '<li><hr class="dropdown-divider"></li>' +
-      '<li><a class="dropdown-item d-flex align-items-center gap-2" href="scenarios.html">' +
+      '<li><a class="dropdown-item d-flex align-items-center gap-2" href="index.html">' +
       '<i class="bi bi-collection"></i> All scenarios</a></li>' +
-      "</ul></li></ul></div></div></nav>";
+      "</ul></li></ul>" +
+      '<ul class="navbar-nav mb-0"><li class="nav-item">' +
+      '<button type="button" class="ap-theme-toggle" id="themeToggle"></button>' +
+      "</li></ul>" +
+      "</div></div></nav>";
+
+    refreshThemeToggle();
+    document.getElementById("themeToggle").addEventListener("click", toggleTheme);
 
     host.addEventListener("click", function (event) {
       var button = event.target.closest("[data-scenario]");
@@ -259,6 +352,8 @@
     fetchJson: fetchJson,
     setActive: writeStored,
     scenarioUrl: scenarioUrl,
+    modeLabel: modeLabel,
+    movingImpactUrl: MOVING_IMPACT_URL,
     escapeHtml: escapeHtml,
     download: download,
     slugify: slugify,

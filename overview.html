@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EV-TRACS">
+    <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
+
+    <title>Model overview — EV-TRACS</title>
+
+    <script>
+      // Set before paint so moving between pages never flashes the other theme.
+      try {
+        var savedTheme = localStorage.getItem("evtracs.theme");
+        if (savedTheme === "dark" || savedTheme === "light") {
+          document.documentElement.setAttribute("data-bs-theme", savedTheme);
+        }
+      } catch (e) {}
+    </script>
+
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="static/css/apple.css" rel="stylesheet">
+  </head>
+
+  <body id="body">
+    <div id="site-nav"></div>
+
+    <div class="ap-shell ap-shell-narrow">
+      <header class="ap-page-head">
+        <p class="ap-eyebrow mb-2">Overview</p>
+        <h1>How the model works</h1>
+        <p class="ap-lead mt-2">
+          The steps behind a scenario, from defining it to reading the results.
+          Pick a model type to see its route through, then choose any step for a
+          description and a walkthrough video.
+        </p>
+      </header>
+
+      <div id="pageError" hidden></div>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <label for="typePicker" class="form-label d-block">Model type</label>
+          <select id="typePicker" class="form-select"></select>
+          <p class="ap-hint mt-3 mb-0" id="typeSummary"></p>
+        </div>
+      </div>
+
+      <div id="flow"></div>
+    </div>
+
+    <!-- Step detail -->
+    <div class="modal fade" id="stepModal" tabindex="-1" aria-hidden="true"
+         aria-labelledby="stepModalTitle">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header align-items-center">
+            <div>
+              <p class="ap-eyebrow mb-1" id="stepModalStage"></p>
+              <h5 class="modal-title mb-0" id="stepModalTitle">Step</h5>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p id="stepModalDescription" class="mb-0"></p>
+          </div>
+          <div class="modal-footer">
+            <span class="ap-hint mb-0 me-auto" id="stepModalNoVideo" hidden>
+              No walkthrough video for this step yet.
+            </span>
+            <span id="stepModalTools" class="ap-about-links"></span>
+            <a id="stepModalVideo" class="btn btn-primary" href="#"
+               target="_blank" rel="noopener" hidden>
+              <i class="bi bi-youtube"></i> Watch the video
+            </a>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="static/js/bootstrap.bundle.js"></script>
+    <script src="static/js/app.js"></script>
+    <script src="static/js/overview.js"></script>
+    <script src="static/js/register-sw.js"></script>
+  </body>
+</html>

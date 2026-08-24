@@ -11,7 +11,17 @@
     <meta name="apple-mobile-web-app-title" content="EV-TRACS">
     <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
 
-    <title>Scenarios — EV-TRACS</title>
+    <title>Tools — EV-TRACS</title>
+
+    <script>
+      // Set before paint so moving between pages never flashes the other theme.
+      try {
+        var savedTheme = localStorage.getItem("evtracs.theme");
+        if (savedTheme === "dark" || savedTheme === "light") {
+          document.documentElement.setAttribute("data-bs-theme", savedTheme);
+        }
+      } catch (e) {}
+    </script>
 
     <link href="static/css/bootstrap.css" rel="stylesheet">
     <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -23,30 +33,34 @@
 
     <div class="ap-shell ap-shell-narrow">
       <header class="ap-page-head">
-        <p class="ap-eyebrow mb-2">Scenarios</p>
-        <h1>Published scenarios</h1>
+        <p class="ap-eyebrow mb-2">Tools</p>
+        <h1>Model tools</h1>
         <p class="ap-lead mt-2">
-          Choose which scenario the site shows. The list is fixed — it comes
-          from <span class="ap-mono">data/scenarios.json</span>.
+          The standalone editors and viewers that go with the model. Each one
+          works on files you open from your own machine and exports what it
+          produces — nothing is read from or written to this site.
         </p>
       </header>
 
       <div id="pageError" hidden></div>
 
-      <div class="card">
-        <div class="card-header d-flex align-items-center justify-content-between gap-2">
-          <span class="card-title d-flex align-items-center gap-2">
-            <i class="bi bi-collection text-body-secondary"></i> All scenarios
-          </span>
-          <span class="ap-eyebrow" id="scenarioCount"></span>
-        </div>
-        <ul class="list-group list-group-flush" id="scenarioList"></ul>
+      <div class="alert alert-info d-flex align-items-start gap-2 mb-4">
+        <i class="bi bi-info-circle mt-1"></i>
+        <span>
+          These open in a new tab and are unchanged from the model — they are
+          the full editors, which create and save files. To look at what a
+          scenario actually published, its <a href="scenario.html">scenario
+          page</a> has read-only views of the same data that you can export
+          from.
+        </span>
       </div>
+
+      <div id="tools"></div>
     </div>
 
     <script src="static/js/bootstrap.bundle.js"></script>
     <script src="static/js/app.js"></script>
-    <script src="static/js/scenarios.js"></script>
+    <script src="static/js/tools.js"></script>
     <script src="static/js/register-sw.js"></script>
   </body>
 </html>

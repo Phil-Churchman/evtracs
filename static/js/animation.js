@@ -436,7 +436,7 @@
       return;
     }
 
-    var isHailRank = animation.mode === "hail_rank";
+    var isHailRank = scenario.mode === "hail_rank";
     trimLegend(isHailRank, Boolean(scenario.swap_stations));
 
     var geography = [];

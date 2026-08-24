@@ -3,6 +3,7 @@ const CACHE_NAME = 'evtracs-static-v1';
 const ASSETS = [
   './',
   './index.html',
+  './scenario.html',
   './static/css/bootstrap.css',
   './static/icons/font/bootstrap-icons.min.css',
   './static/css/apple.css'

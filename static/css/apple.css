@@ -315,11 +315,29 @@ a:hover { text-decoration: none; }
 
 .ap-nav .navbar-brand:hover { color: var(--ap-ink); opacity: 0.7; }
 
+/* The Moving IMPACT mark is a wide wordmark, so it is sized by height and lets
+   its own aspect ratio set the width. */
 .ap-nav .navbar-brand img {
-  width: 26px;
   height: 26px;
-  border-radius: 7px;
+  width: auto;
   display: block;
+}
+
+.ap-nav .navbar-brand a {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity var(--ap-dur) var(--ap-ease);
+}
+
+.ap-nav .navbar-brand a:hover { opacity: 0.7; }
+
+/* A hairline keeps the project mark and the tool's name from reading as one
+   word. */
+.ap-nav .ap-brand-name {
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--ap-hairline-strong);
 }
 
 .ap-nav .nav-link {
@@ -753,6 +771,27 @@ a:hover { text-decoration: none; }
 }
 
 .ap-stat-value.is-blue { color: var(--ap-blue); }
+
+/* A stat whose value is words rather than a number - "Demand model" at 2rem
+   would wrap and tower over the figures beside it. */
+.ap-stat-value.is-text {
+  font-size: 1.0625rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  /* Hold the row's baseline so all three values sit level. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+}
+
+/* The unit rides small next to its figure: "24 h", not "24 H". */
+.ap-stat-unit {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  margin-left: 0.15em;
+  color: var(--ap-ink-4);
+}
 .ap-stat-value.is-green { color: var(--ap-green); }
 .ap-stat-value.is-orange { color: var(--ap-orange); }
 
@@ -1141,6 +1180,22 @@ a.ap-tile:hover {
   line-height: 1.45;
 }
 
+/* Workflow sections on the scenario page: Define, Run, View, Analyse. The rule
+   under each heading does the separating, so the sections need no card of their
+   own around the tiles. */
+.ap-section + .ap-section { margin-top: 2rem; }
+
+.ap-section-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-ink-4);
+  margin-bottom: 0.875rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--ap-hairline);
+}
+
 /* A tile for something this scenario has not published: still legible, but
    plainly not a link. */
 .ap-tile-muted {
@@ -1208,12 +1263,13 @@ a.ap-tile:hover .ap-tile-more i { transform: translateX(3px); }
   min-width: 0;
 }
 
+/* A row stacks the scenario's name over which mode it runs in. */
 .ap-scenario-text {
   display: flex;
-  align-items: center;
-  gap: 0.625rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.125rem;
   min-width: 0;
-  flex-wrap: wrap;
 }
 
 .ap-scenario-name {
@@ -1222,30 +1278,9 @@ a.ap-tile:hover .ap-tile-more i { transform: translateX(3px); }
   word-break: break-word;
 }
 
-/* Radio-style selector: an empty ring until the scenario is active. */
-.ap-scenario-mark {
-  width: 22px;
-  height: 22px;
-  flex: none;
-  border-radius: 50%;
-  border: 1.5px solid var(--ap-hairline-strong);
-  background: transparent;
-  padding: 0;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  color: #fff;
-  font-size: 0.75rem;
-  transition: border-color var(--ap-dur) var(--ap-ease),
-              background-color var(--ap-dur) var(--ap-ease);
-}
-
-.ap-scenario-mark:hover { border-color: var(--ap-blue); }
-
-.ap-scenario-mark.is-on {
-  background: var(--ap-blue);
-  border-color: var(--ap-blue);
-  cursor: default;
+.ap-scenario-mode {
+  font-size: 0.8125rem;
+  color: var(--ap-ink-4);
 }
 
 .ap-scenario-actions {
@@ -1255,13 +1290,27 @@ a.ap-tile:hover .ap-tile-more i { transform: translateX(3px); }
   flex-wrap: wrap;
 }
 
-/* Each action is its own POST form; keep them from adding layout gaps. */
-.ap-scenario-row form { margin: 0; display: inline-flex; }
+/* Light/dark switch. Sized to match the nav links beside it rather than
+   drawn as a button, so it sits in the bar rather than on it. */
+.ap-theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ap-ink-2);
+  font-size: 1rem;
+  transition: background-color var(--ap-dur) var(--ap-ease),
+              color var(--ap-dur) var(--ap-ease);
+}
 
-/* The inline rename form takes over the whole row. */
-.ap-scenario-rename { display: block; width: 100%; }
-.ap-scenario-rename .ap-form-row { align-items: flex-start; }
-.ap-scenario-rename .btn { white-space: nowrap; }
+.ap-theme-toggle:hover {
+  background: var(--ap-fill);
+  color: var(--ap-ink);
+}
 
 /* Active scenario name in the navbar. */
 .ap-nav-scenario {
@@ -1752,7 +1801,264 @@ label.btn { cursor: pointer; }
 }
 
 /* -------------------------------------------------------------------------
-   20. Motion preferences
+   20. Model overview flow chart
+   ---------------------------------------------------------------------- */
+
+/* Stages run down the page as lanes rather than across as columns: a stage can
+   hold one step or seven, and columns of wildly different heights read worse
+   than rows that simply wrap. */
+.ap-flow-stage {
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-hairline);
+  border-radius: var(--ap-r-lg);
+  box-shadow: var(--ap-shadow-sm);
+  padding: 1rem 1.125rem 1.125rem;
+}
+
+.ap-flow-stage-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ap-ink-4);
+  margin: 0 0 0.875rem;
+}
+
+.ap-flow-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+/* Each step is a button so it is reachable by keyboard and announced as
+   something you can act on, not just a coloured box. */
+.ap-flow-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--ap-hairline-strong);
+  border-radius: var(--ap-r-md);
+  background: var(--ap-surface);
+  color: var(--ap-ink);
+  font-size: 0.875rem;
+  text-align: left;
+  transition: border-color var(--ap-dur) var(--ap-ease),
+              background-color var(--ap-dur) var(--ap-ease),
+              transform var(--ap-dur) var(--ap-ease);
+}
+
+.ap-flow-step:hover {
+  border-color: var(--ap-blue);
+  background: var(--ap-blue-soft);
+}
+
+.ap-flow-step:active { transform: scale(0.985); }
+
+.ap-flow-step-no {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ap-fill);
+  color: var(--ap-ink-3);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-flow-step:hover .ap-flow-step-no {
+  background: var(--ap-blue);
+  color: #fff;
+}
+
+.ap-flow-step-title { min-width: 0; overflow-wrap: anywhere; }
+
+/* Marks a step that has a walkthrough behind it. */
+.ap-flow-step-video {
+  margin-left: auto;
+  flex: none;
+  color: var(--ap-ink-4);
+  font-size: 0.875rem;
+}
+
+.ap-flow-step:hover .ap-flow-step-video { color: var(--ap-blue); }
+
+.ap-flow-join {
+  display: flex;
+  align-items: center;
+  color: var(--ap-ink-4);
+  font-size: 0.75rem;
+  flex: none;
+}
+
+.ap-flow-down {
+  display: flex;
+  justify-content: center;
+  color: var(--ap-ink-4);
+  padding: 0.5rem 0;
+  font-size: 1.125rem;
+}
+
+/* On a phone the steps stack, so the between-step chevrons would point the
+   wrong way. Hide them and let the stacking imply the order. */
+@media (max-width: 575.98px) {
+  .ap-flow-step { flex-basis: 100%; }
+  .ap-flow-join { display: none; }
+}
+
+/* -------------------------------------------------------------------------
+   21. About
+   ---------------------------------------------------------------------- */
+
+/* The funding statement is an acknowledgement, so it is set apart from the
+   prose around it rather than reading as another paragraph. */
+.ap-funding {
+  border-left: 3px solid var(--ap-green);
+  padding-left: 0.875rem;
+  font-size: 0.9375rem;
+  color: var(--ap-ink-2);
+}
+
+.ap-about-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+/* Tools relevant to a stage on the scenario page. Deliberately lighter than the
+   tiles above them: these leave the site, and are a sidelong offer rather than
+   the main thing the stage is for. */
+.ap-stage-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.ap-stage-tools-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-ink-4);
+  margin-right: 0.125rem;
+}
+
+.ap-stage-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--ap-hairline-strong);
+  border-radius: var(--ap-r-pill);
+  background: var(--ap-surface);
+  color: var(--ap-ink-2);
+  font-size: 0.8125rem;
+  text-decoration: none;
+  transition: border-color var(--ap-dur) var(--ap-ease),
+              color var(--ap-dur) var(--ap-ease);
+}
+
+.ap-stage-tool:hover {
+  border-color: var(--ap-blue);
+  color: var(--ap-blue);
+}
+
+.ap-stage-tool-out {
+  font-size: 0.6875rem;
+  opacity: 0.6;
+}
+
+/* -------------------------------------------------------------------------
+   22. Demand frequencies
+   ---------------------------------------------------------------------- */
+
+.ap-freq-flow {
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--ap-hairline);
+}
+
+.ap-freq-flow:last-child { border-bottom: 0; padding-bottom: 0; }
+.ap-freq-flow:first-child { padding-top: 0; }
+
+.ap-freq-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.625rem;
+}
+
+.ap-freq-route {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.ap-freq-route i {
+  font-size: 0.75rem;
+  color: var(--ap-ink-4);
+  margin: 0 0.15rem;
+}
+
+.ap-freq-total {
+  flex: none;
+  font-size: 0.8125rem;
+  color: var(--ap-ink-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-freq-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.625rem;
+  margin-top: 0.5rem;
+}
+
+.ap-freq-label {
+  flex: none;
+  width: 3.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ap-ink-4);
+}
+
+/* Bars share the row's width, so a 24-hour profile and a 7-day one line up
+   under each other however many buckets each has. */
+.ap-freq-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  flex: 1;
+  height: 34px;
+}
+
+.ap-freq-bar {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.ap-freq-bar-fill {
+  width: 100%;
+  background: var(--ap-blue);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.85;
+}
+
+/* -------------------------------------------------------------------------
+   23. Motion preferences
    ---------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {

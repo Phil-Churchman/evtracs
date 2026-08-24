@@ -13,6 +13,16 @@
 
     <title>Global parameters — EV-TRACS</title>
 
+    <script>
+      // Set before paint so moving between pages never flashes the other theme.
+      try {
+        var savedTheme = localStorage.getItem("evtracs.theme");
+        if (savedTheme === "dark" || savedTheme === "light") {
+          document.documentElement.setAttribute("data-bs-theme", savedTheme);
+        }
+      } catch (e) {}
+    </script>
+
     <link href="static/css/bootstrap.css" rel="stylesheet">
     <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="static/css/apple.css" rel="stylesheet">
@@ -39,7 +49,7 @@
         <a id="downloadLink" class="btn btn-primary" href="#" download hidden>
           <i class="bi bi-download"></i> Download road speeds
         </a>
-        <a href="scenarios.html" class="btn btn-secondary">Scenarios</a>
+        <a href="index.html" class="btn btn-secondary">Scenarios</a>
       </div>
     </div>
 

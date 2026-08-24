@@ -13,6 +13,16 @@
 
     <title>Swap stations — EV-TRACS</title>
 
+    <script>
+      // Set before paint so moving between pages never flashes the other theme.
+      try {
+        var savedTheme = localStorage.getItem("evtracs.theme");
+        if (savedTheme === "dark" || savedTheme === "light") {
+          document.documentElement.setAttribute("data-bs-theme", savedTheme);
+        }
+      } catch (e) {}
+    </script>
+
     <link href="static/css/bootstrap.css" rel="stylesheet">
     <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@7.5.2/ol.css">
@@ -25,7 +35,7 @@
     <div class="ap-shell ap-shell-wide">
       <header class="ap-page-head">
         <p class="ap-eyebrow mb-2">
-          <a href="scenarios.html" class="ap-back"><i class="bi bi-chevron-left"></i> Scenarios</a>
+          <a href="scenario.html" class="ap-back"><i class="bi bi-chevron-left"></i> Scenario</a>
         </p>
         <h1 id="scenarioName">Swap stations</h1>
         <p class="ap-lead mt-2">
