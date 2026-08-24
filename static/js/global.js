@@ -10,6 +10,7 @@
   var E = window.EVTRACS;
 
   var ROAD_SPEED_KEY = "road_speed_km-h";
+  var STEPS_URL = "data/model_steps.json";
 
   // The order road types are shown in, which is the order the model lists them.
   // Anything the file adds beyond this is shown after, so a new highway type
@@ -83,6 +84,38 @@
     );
   }
 
+  /* Steps every model type depends on and none of them owns - setting up the
+     environment is the same job whichever mode you are going to run. They live
+     at the top level of model_steps.json rather than in any type's steps. */
+  function setupCard(setup, videos) {
+    var items = setup
+      .map(function (step) {
+        var video = step.video ? videos[step.video] : null;
+        return (
+          '<div class="ap-setup-step">' +
+          "<h3>" + E.escapeHtml(step.title) + "</h3>" +
+          "<p>" + E.escapeHtml(step.description || "") + "</p>" +
+          (video
+            ? '<a class="btn btn-sm btn-secondary" target="_blank" rel="noopener" href="' +
+              E.escapeHtml(watchUrl(video.youtube)) +
+              '"><i class="bi bi-youtube"></i> Watch the video</a>'
+            : "") +
+          "</div>"
+        );
+      })
+      .join("");
+
+    return card("bi-box-seam", "Setup", setup.length + " step" +
+                (setup.length === 1 ? "" : "s"), items);
+  }
+
+  /* The catalogue stores /embed/ urls, which play bare; a link should open the
+     real page. Same rewrite the overview does. */
+  function watchUrl(embedUrl) {
+    var match = /youtube\.com\/embed\/([\w-]+)/.exec(embedUrl || "");
+    return match ? "https://www.youtube.com/watch?v=" + match[1] : embedUrl;
+  }
+
   function missingCard() {
     return (
       '<div class="ap-empty"><div class="ap-empty-icon"><i class="bi bi-signpost-split"></i></div>' +
@@ -95,23 +128,36 @@
     var host = document.getElementById("globals");
     var url = globals && globals.road_speeds;
 
-    if (!url) {
-      host.innerHTML = missingCard();
-      return;
+    if (url) {
+      var link = document.getElementById("downloadLink");
+      link.href = url;
+      link.setAttribute("download", "road_speeds.json");
+      link.hidden = false;
     }
 
-    var link = document.getElementById("downloadLink");
-    link.href = url;
-    link.setAttribute("download", "road_speeds.json");
-    link.hidden = false;
-
-    return E.fetchJson(url).then(function (payload) {
-      // The file may be either {"road_speed_km-h": {...}} or a bare table,
-      // matching what the model accepts.
+    // Setup comes from the step catalogue, road speeds from the model's own
+    // table. Either can be missing without taking the other down with it.
+    return Promise.all([
+      url ? E.fetchJson(url).catch(logMiss(url)) : null,
+      E.fetchJson(STEPS_URL).catch(logMiss(STEPS_URL))
+    ]).then(function (loaded) {
+      var payload = loaded[0];
+      var catalogue = loaded[1] || {};
       var speeds = (payload && payload[ROAD_SPEED_KEY]) || payload || {};
-      host.innerHTML = Object.keys(speeds).length
-        ? roadSpeedsCard(speeds, globals.road_speeds_source)
-        : missingCard();
+      var setup = catalogue.setup || [];
+
+      host.innerHTML =
+        (setup.length ? setupCard(setup, catalogue.videos || {}) : "") +
+        (Object.keys(speeds).length
+          ? roadSpeedsCard(speeds, globals.road_speeds_source)
+          : missingCard());
     });
   });
+
+  function logMiss(what) {
+    return function (error) {
+      console.warn("Could not load " + what, error);
+      return null;
+    };
+  }
 })();

@@ -27,7 +27,7 @@ Then open <http://127.0.0.1:8000/>.
 | `frequencies.html`       | One scenario's demand frequencies                    |
 | `facilities.html`        | One scenario's swap stations and taxi ranks          |
 | `overview.html`          | How the model works, per model type                  |
-| `global.html`            | Parameters shared by every scenario                  |
+| `global.html`            | Setup and parameters shared by every scenario        |
 | `animation.html`         | Agent trips played back over the area                |
 | `stations.html`          | Swap stations, and each one's queue through the day  |
 | `outputs.html`           | The charts a scenario's run produced                 |
@@ -183,7 +183,13 @@ between the two:
 ```
 
 The global page shows the known highway types first, in the model's order, then
-any extra ones the file defines.
+any extra ones the file defines. It also carries the `setup` steps from
+`model_steps.json` — setting up the Python environment is the same job whichever
+mode you are about to run, so it belongs there rather than repeated at the head
+of all four flow charts.
+
+Every type's Define stage now leads with the area and then the road network: the
+roads are extracted *for* an area, so that is the order the work happens in.
 
 ### `area.geojson`
 
@@ -432,6 +438,8 @@ picker writes back, so a particular workflow is linkable.
 }
 ```
 
+- `setup` — steps every model type depends on and none of them owns. They are
+  shown on the global page, not in any type's flow chart.
 - `tools` — the standalone tools, keyed by id, each with the file it lives in
   and an icon.
 - `videos` — the walkthroughs, keyed by id. The urls are copied from
