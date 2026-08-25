@@ -308,6 +308,25 @@
     });
   }
 
+  /* A detail page normally sits under a scenario, so its markup points back
+     there. Arriving from the overview instead, it should lead back to the
+     workflow that sent you - and to the same model type, which the overview
+     carries in its own URL. Pages keep their own back link when no `from` is
+     given, which is why this only ever rewrites and never invents one. */
+  function applyBackLink() {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get("from") !== "overview") {
+      return;
+    }
+    var back = document.querySelector && document.querySelector(".ap-back");
+    if (!back) {
+      return;
+    }
+    var type = params.get("type");
+    back.href = "overview.html" + (type ? "?type=" + encodeURIComponent(type) : "");
+    back.innerHTML = '<i class="bi bi-chevron-left"></i> Overview';
+  }
+
   // --- Page startup ---------------------------------------------------------
 
   function showError(message) {
@@ -334,6 +353,7 @@
         var active = resolveScenario(catalogue.scenarios);
         writeStored(active.id);
         renderNav(page, catalogue.scenarios, active);
+        applyBackLink();
         return render
           ? render(active, catalogue.scenarios, catalogue.global)
           : undefined;

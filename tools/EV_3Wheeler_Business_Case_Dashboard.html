@@ -221,5 +221,56 @@ document.getElementById('exportBtn').addEventListener('click', () => {
 });
 </script>
 
+<script id="evtracs-preload">
+  /* Added when this tool is published to the static site: load the workbook
+     that ships beside it, so the dashboard opens with the business case already
+     in it. Choosing a file still replaces it. */
+  (function () {
+    var WORKBOOK_URL = "data/EV_3Wheeler_Battery_Swap_Taxi_Business_Case.xlsx";
+
+    function fill(sheet) {
+      XLSX.utils.sheet_to_json(sheet, { header: 1 }).forEach(function (row) {
+        var label = row[0], value = row[1];
+        if (typeof value === "number") {
+          defaults[label] = value;
+          inputs[label] = value;
+        }
+      });
+    }
+
+    function note(text, isError) {
+      var holder = document.getElementById("inputsContainer");
+      if (!holder) { return; }
+      var p = document.createElement("p");
+      p.className = isError ? "text-danger small" : "text-body-secondary small";
+      p.textContent = text;
+      holder.parentNode.insertBefore(p, holder);
+    }
+
+    // file:// has no fetch to speak of, and there is nothing to serve from.
+    if (window.location.protocol === "file:") { return; }
+
+    fetch(WORKBOOK_URL)
+      .then(function (response) {
+        if (!response.ok) { throw new Error(response.status + " " + response.statusText); }
+        return response.arrayBuffer();
+      })
+      .then(function (buffer) {
+        workbook = XLSX.read(new Uint8Array(buffer), { type: "array" });
+        var sheet = workbook.Sheets["Assumptions"] || workbook.Sheets["Assumptions_Ghana"];
+        if (!sheet) { throw new Error("no Assumptions sheet"); }
+        fill(sheet);
+        buildSliders();
+        computeOutputs();
+        note("Loaded from EV_3Wheeler_Battery_Swap_Taxi_Business_Case.xlsx. Move a slider to explore, or choose "
+             + "your own workbook above.");
+      })
+      .catch(function (error) {
+        console.warn("Could not preload " + WORKBOOK_URL, error);
+        note("Could not load the example workbook - choose an .xlsx file to "
+             + "get started.", true);
+      });
+  })();
+</script>
 </body>
 </html>

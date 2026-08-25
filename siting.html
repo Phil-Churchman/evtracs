@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EV-TRACS">
+    <link rel="apple-touch-icon" href="static/images/icon-192x192.png">
+
+    <title>Station siting &mdash; EV-TRACS</title>
+
+    <script>
+      // Set before paint so moving between pages never flashes the other theme.
+      try {
+        var savedTheme = localStorage.getItem("evtracs.theme");
+        if (savedTheme === "dark" || savedTheme === "light") {
+          document.documentElement.setAttribute("data-bs-theme", savedTheme);
+        }
+      } catch (e) {}
+    </script>
+
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/icons/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="static/css/apple.css" rel="stylesheet">
+  </head>
+
+  <body id="body">
+    <div id="site-nav"></div>
+
+    <div class="ap-shell ap-shell-narrow">
+      <header class="ap-page-head">
+        <p class="ap-eyebrow mb-2">
+          <a href="tools.html" class="ap-back"><i class="bi bi-chevron-left"></i> Other tools</a>
+        </p>
+        <h1>Optimising station locations</h1>
+        <p class="ap-lead mt-2">
+          Where to put a given number of swap or charge stations so drivers
+          travel as little as possible to reach one &mdash; solved six different
+          ways over the scenario&rsquo;s own road network.
+        </p>
+      </header>
+
+      <div id="pageError" hidden></div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-box-arrow-in-down text-body-secondary"></i>
+          <span class="card-title">What goes in</span>
+        </div>
+        <div class="card-body">
+          <dl class="ap-summary mb-3">
+            <div>
+              <dt>Demand points</dt>
+              <dd><span class="ap-mono">taxi_ranks.geojson</span></dd>
+            </div>
+            <div>
+              <dt>Road network</dt>
+              <dd><span class="ap-mono">road_network.graphml</span></dd>
+            </div>
+            <div>
+              <dt>Boundary</dt>
+              <dd><span class="ap-mono">area.geojson</span></dd>
+            </div>
+          </dl>
+          <p class="ap-hint mb-0">
+            All three come from the scenario&rsquo;s own input folder, so the
+            stations are placed on the same network the simulation will route
+            over. The taxi ranks stand in for demand: they are where vehicles
+            wait between fares, and so where a battery is most likely to need
+            swapping.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-crosshair text-body-secondary"></i>
+          <span class="card-title">The problem being solved</span>
+        </div>
+        <div class="card-body">
+          <p>
+            This is the <strong>p-median</strong> problem. Given a fixed number
+            of stations, choose their locations so that the total distance from
+            every demand point to its nearest station is as small as possible.
+            Every junction in the road network is a candidate, so on a
+            city-sized graph there are far too many combinations to try them
+            all.
+          </p>
+          <p>
+            Distance is measured <strong>along the roads</strong>, not as the
+            crow flies. A station on the far bank of a river is close on a map
+            and useless in practice, and only network distance tells the two
+            apart. Before any search starts, the shortest path is computed from
+            every rank to every node in the network, in parallel across all
+            cores, and held in memory &mdash; every method then reads distances
+            out of that table rather than re-routing as it goes.
+          </p>
+          <p class="mb-0">
+            That precomputation is the expensive part and it is shared, which is
+            what makes running six methods over the same area practical.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between gap-2">
+          <span class="card-title d-flex align-items-center gap-2">
+            <i class="bi bi-diagram-3 text-body-secondary"></i> Six ways to search
+          </span>
+          <span class="ap-eyebrow">one per script</span>
+        </div>
+        <div class="card-body">
+          <ol class="ap-pipeline">
+            <li>
+              <h3>Interchange</h3>
+              <p>Start from a random set of stations, then try moving each one
+                to every candidate node in turn and keep whichever single move
+                helps most. Repeat until no move improves the total, or for
+                <strong>10 rounds</strong>. Exhaustive and reliably good, but it
+                evaluates every station against every node on every round.</p>
+            </li>
+            <li>
+              <h3>Simulated annealing</h3>
+              <p>Move one station at a time at random, always accepting an
+                improvement and sometimes accepting a worse solution so the
+                search can climb back out of a dead end. The chance of doing so
+                cools geometrically &mdash; <strong>1500 moves</strong> at each
+                temperature, multiplied by <strong>0.97</strong> each step from
+                1.0 down to 0.0001 &mdash; and the whole thing runs
+                <strong>three times</strong> from different starts.</p>
+            </li>
+            <li>
+              <h3>Tabu search</h3>
+              <p>Sample <strong>50 candidate moves</strong> each iteration and
+                take the best, then forbid reversing it for the next
+                <strong>10 iterations</strong> so the search cannot oscillate
+                between the same two solutions. A move that beats the best
+                result so far is allowed through the ban anyway. Runs
+                <strong>100 iterations</strong>, ten times over, keeping the
+                best.</p>
+            </li>
+            <li>
+              <h3>Genetic algorithm</h3>
+              <p>Hold <strong>60</strong> candidate solutions at once, pick
+                parents by three-way tournament, combine them and mutate
+                <strong>one station in five</strong>, for up to
+                <strong>200 generations</strong>. Explores widely because it
+                never commits to a single line of attack.</p>
+            </li>
+            <li>
+              <h3>Particle swarm</h3>
+              <p><strong>30 particles</strong> move through the space of
+                possible station sets for <strong>100 iterations</strong>, each
+                pulled towards its own best solution and the swarm&rsquo;s best.
+                The quickest of the six by a wide margin.</p>
+            </li>
+            <li>
+              <h3>K-means and Voronoi</h3>
+              <p>The odd one out: it clusters the ranks geometrically and puts a
+                station at each cluster centre, then draws the Voronoi
+                catchments around them, clipped to the area boundary. It ignores
+                the road network entirely, which makes it fast and makes its
+                distances straight-line rather than driven &mdash; useful as a
+                sanity check and for the catchment polygons, not as an
+                answer.</p>
+            </li>
+          </ol>
+          <p class="ap-hint mt-3 mb-0">
+            The five network methods can be pointed at a random subset of
+            candidate nodes with <span class="ap-mono">--sample N</span>, which
+            trades a little quality for a much shorter run on a large graph.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-box-arrow-up text-body-secondary"></i>
+          <span class="card-title">What comes out</span>
+        </div>
+        <div class="card-body">
+          <h3 class="ap-out-title"><span class="ap-mono">swap_stations_&lt;method&gt;.geojson</span></h3>
+          <p>Run with a number of stations &mdash; five if none is given &mdash;
+            and you get the chosen locations as points, plus a line from every
+            rank to the station it was assigned to. The lines are straight
+            assignment links rather than routes: they show which ranks a station
+            serves, not the path taken. The k-means run adds its Voronoi
+            catchment polygons alongside.</p>
+
+          <h3 class="ap-out-title mt-4"><span class="ap-mono">facility_analysis_&lt;method&gt;.csv</span></h3>
+          <p class="mb-0">Run with <span class="ap-mono">-analysis</span>
+            instead and the whole solve repeats for
+            <strong>1 to 20 stations</strong>, recording the average and worst
+            distance to the nearest station at each count, and the total time
+            taken. That curve is what tells you how many stations are worth
+            building.</p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between gap-2">
+          <span class="card-title d-flex align-items-center gap-2">
+            <i class="bi bi-graph-down-arrow text-body-secondary"></i> How the methods compare
+          </span>
+          <span class="ap-eyebrow">Accra taxi ranks</span>
+        </div>
+        <div class="card-body">
+          <p>Average metres from a rank to its nearest station, from one run of
+            each method over the Accra ranks. Lower is better; the best network
+            result in each row is highlighted.</p>
+          <div class="ap-table-wrap">
+            <table class="ap-method-table">
+              <thead>
+                <tr>
+                  <th scope="col">Stations</th>
+                  <th scope="col">Interchange</th>
+                  <th scope="col">Annealing</th>
+                  <th scope="col">Tabu</th>
+                  <th scope="col">Genetic</th>
+                  <th scope="col">Swarm</th>
+                  <th scope="col">K&#8209;means</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td class="is-best">7,582</td>
+                  <td>7,582</td>
+                  <td>7,584</td>
+                  <td>7,594</td>
+                  <td>7,582</td>
+                  <td>7,942</td>
+                </tr>
+                <tr>
+                  <th scope="row">5</th>
+                  <td class="is-best">2,651</td>
+                  <td>2,651</td>
+                  <td>2,761</td>
+                  <td>2,887</td>
+                  <td>3,095</td>
+                  <td>3,387</td>
+                </tr>
+                <tr>
+                  <th scope="row">10</th>
+                  <td class="is-best">1,478</td>
+                  <td>1,478</td>
+                  <td>1,699</td>
+                  <td>1,828</td>
+                  <td>2,300</td>
+                  <td>1,831</td>
+                </tr>
+                <tr>
+                  <th scope="row">20</th>
+                  <td>835</td>
+                  <td class="is-best">832</td>
+                  <td>1,055</td>
+                  <td>1,264</td>
+                  <td>1,737</td>
+                  <td>1,285</td>
+                </tr>
+                <tr class="is-aside">
+                  <th scope="row">Run time</th>
+                  <td>109 min</td>
+                  <td>186 min</td>
+                  <td>90 s</td>
+                  <td>2 min</td>
+                  <td>42 s</td>
+                  <td>2 min</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-3">
+            Two things show up. The first is that <strong>returns fall away
+            sharply</strong>: the first five stations cut the average journey by
+            two thirds, the next fifteen only halve it again. The second is that
+            <strong>the thorough methods are worth their time only when the
+            answer matters</strong> &mdash; interchange and annealing agree
+            closely and win throughout, but take hours where the swarm takes
+            under a minute to land within a few hundred metres of them.
+          </p>
+          <p class="ap-hint mb-0">
+            K-means is shown for completeness, but its column is straight-line
+            distance and so is not directly comparable with the rest.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-arrow-right-circle text-body-secondary"></i>
+          <span class="card-title">Where it is used</span>
+        </div>
+        <div class="card-body">
+          <p>This sits behind the <strong>Place swap stations</strong> step of
+            the workflow. The chosen locations become the scenario&rsquo;s
+            facilities &mdash; the points agents route to when a battery runs
+            down &mdash; and can be adjusted by hand afterwards in the
+            <a href="facilities.html">facilities editor</a>, which is where real
+            constraints like land, grid connection and opening hours get
+            applied.</p>
+          <p class="mb-0">Once a scenario has run, the
+            <a href="stations.html">station animation</a> shows what actually
+            happened at each of them through the day: queues, swaps and idle
+            time. Optimised placement minimises travel to a station; it says
+            nothing about whether that station can serve everyone who arrives.
+            The <a href="overview.html">model overview</a> puts both in
+            sequence.</p>
+        </div>
+      </div>
+
+      <div class="ap-form-actions">
+        <a id="sitingVideo" class="btn btn-primary" href="#"
+           target="_blank" rel="noopener" hidden>
+          <i class="bi bi-youtube"></i> Watch the walkthrough
+        </a>
+        <a href="tools.html" class="btn btn-secondary">Other tools</a>
+      </div>
+    </div>
+
+    <script src="static/js/bootstrap.bundle.js"></script>
+    <script src="static/js/app.js"></script>
+    <script src="static/js/siting.js"></script>
+    <script src="static/js/register-sw.js"></script>
+  </body>
+</html>

@@ -141,8 +141,10 @@
     document.getElementById("stepModalParameters").innerHTML =
       entry.step.show_parameters ? parameterList() : "";
 
-    // A step that has a tool offers it here, so the modal is somewhere to act
-    // from rather than only somewhere to read.
+    /* A step that has a tool offers it here, so the modal is somewhere to act
+       from rather than only somewhere to read. Anything under tools/ is a
+       separate application and opens in a new tab; a page of this site opens in
+       place, the same distinction the Other tools page makes. */
     document.getElementById("stepModalTools").innerHTML =
       (entry.step.tools || [])
         .map(function (id) {
@@ -150,10 +152,17 @@
           if (!tool) {
             return "";
           }
+          var standalone = tool.file.indexOf("tools/") === 0;
+          // A site page is told where it was opened from, so its back link can
+          // lead here rather than to the scenario it defaults to.
+          var href = standalone
+            ? tool.file
+            : tool.file + "?from=overview&type=" + encodeURIComponent(currentType);
           return (
-            '<a class="btn btn-secondary" href="' + E.escapeHtml(tool.file) +
-            '" target="_blank" rel="noopener"><i class="bi ' +
-            E.escapeHtml(tool.icon) + '"></i> ' + E.escapeHtml(tool.title) + "</a>"
+            '<a class="btn btn-secondary" href="' + E.escapeHtml(href) + '"' +
+            (standalone ? ' target="_blank" rel="noopener"' : "") +
+            '><i class="bi ' + E.escapeHtml(tool.icon) + '"></i> ' +
+            E.escapeHtml(tool.title) + "</a>"
           );
         })
         .join("");

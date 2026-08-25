@@ -2181,7 +2181,73 @@ label.btn { cursor: pointer; }
 }
 
 /* -------------------------------------------------------------------------
-   24. Motion preferences
+   24. Station siting
+   ---------------------------------------------------------------------- */
+
+/* The methods are best read side by side, so this one page has a table. It
+   scrolls inside its own box rather than widening the page on a phone. */
+.ap-table-wrap {
+  overflow-x: auto;
+  margin: 0 -0.25rem;
+  padding: 0 0.25rem;
+}
+
+.ap-method-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.ap-method-table th,
+.ap-method-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--ap-hairline);
+  text-align: right;
+}
+
+.ap-method-table th:first-child,
+.ap-method-table td:first-child {
+  text-align: left;
+  white-space: normal;
+}
+
+.ap-method-table thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ap-ink-3);
+  border-bottom-color: var(--ap-hairline-strong);
+}
+
+.ap-method-table tbody td {
+  font-family: var(--ap-font-mono);
+  font-size: 0.8125rem;
+  color: var(--ap-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-method-table tbody td:first-child {
+  font-family: var(--ap-font-sans);
+  font-size: 0.875rem;
+  color: var(--ap-ink);
+}
+
+.ap-method-table tbody tr:last-child td { border-bottom: 0; }
+
+/* The winning figure in each row, so the comparison reads at a glance. */
+.ap-method-table td.is-best {
+  color: var(--ap-green);
+  font-weight: 600;
+}
+
+/* The run-time row is context rather than result. */
+.ap-method-table tr.is-aside td {
+  color: var(--ap-ink-4);
+  border-top: 1px solid var(--ap-hairline-strong);
+}
+
+/* -------------------------------------------------------------------------
+   25. Motion preferences
    ---------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {

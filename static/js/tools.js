@@ -26,6 +26,13 @@
           blurb: "How captured GPS journeys are cleaned, matched onto the road network and summarised, and what the two viewers show."
         },
         {
+          page: "siting.html",
+          icon: "bi-crosshair",
+          tint: "is-purple",
+          title: "Optimise swap/charge station locations",
+          blurb: "Six ways of choosing where a given number of stations should go so drivers travel least far to reach one, and how they compare."
+        },
+        {
           file: "geojson_editor.html",
           icon: "bi-braces",
           title: "JSON / GeoJSON editor",

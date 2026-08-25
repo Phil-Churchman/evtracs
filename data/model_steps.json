@@ -96,6 +96,11 @@
       "title": "Tracking data pipeline",
       "file": "tracking.html",
       "icon": "bi-signpost-2"
+    },
+    "animation-page": {
+      "title": "Trip animation",
+      "file": "animation.html",
+      "icon": "bi-play-circle"
     }
   },
   "stages": [
@@ -223,7 +228,10 @@
     "animate": {
       "title": "Watch the trips",
       "description": "Play the whole fleet's day back over the map, with each agent coloured by what it is doing at that moment.",
-      "video": "trip-animation"
+      "video": "trip-animation",
+      "tools": [
+        "animation-page"
+      ]
     },
     "stationView": {
       "title": "Watch the swap stations",
