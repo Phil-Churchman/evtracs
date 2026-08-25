@@ -246,7 +246,7 @@
   },
   "types": {
     "hail_rank": {
-      "summary": "Agents find passengers by travelling towards a nearby taxi rank, with a defined probability of being hailed en route versus after waiting at the taxi rank.  Passenger destinations within the scenarion area and within a defined maximum distance are randomly selected.",
+      "summary": "Agents find passengers by travelling towards a nearby taxi rank, with a defined probability of being hailed en route versus after waiting at the taxi rank.  Passenger destinations within the scenario area and within a defined maximum distance are randomly selected.",
       "pages": [
         "parameters",
         "area",
