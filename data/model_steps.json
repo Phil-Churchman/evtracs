@@ -92,11 +92,6 @@
       "file": "tools/view_cleaned_data.html",
       "icon": "bi-graph-up"
     },
-    "tracking-overview": {
-      "title": "Tracking data pipeline",
-      "file": "tracking.html",
-      "icon": "bi-signpost-2"
-    },
     "animation-page": {
       "title": "Trip animation",
       "file": "animation.html",
@@ -385,7 +380,6 @@
             "description": "Load the recorded vehicle journeys, clean the GPS noise out of them, and map-match them onto the road network.",
             "video": "vehicle-tracking",
             "tools": [
-              "tracking-overview",
               "track-viewer",
               "tracked-animation"
             ]
@@ -396,18 +390,12 @@
           {
             "title": "Chain segments into journeys",
             "description": "Decide which consecutive segments are really one journey. For each pair the router is asked for the direct path from the first trip's start to the second's end and compares it with what the vehicle actually covered: a near-identical time means stopping there cost nothing and the two are one journey, while a detour means there was a real destination between them. The verdicts are then applied to produce a chained trip file, following runs of chained pairs so A-B-C collapses to one journey.",
-            "video": "vehicle-tracking",
-            "tools": [
-              "tracking-overview"
-            ]
+            "video": "vehicle-tracking"
           },
           {
             "title": "Generate trip routes",
             "description": "Snap each recorded trip's endpoints to the road network and route between them with the same weights the simulation uses, writing one file per vehicle in the format a simulation run produces. The timeline stays the recorded one: the routed hop times are rescaled to the duration actually observed, and the gaps between trips become idle points.",
-            "video": "vehicle-tracking",
-            "tools": [
-              "tracking-overview"
-            ]
+            "video": "vehicle-tracking"
           }
         ],
         "view": [
@@ -429,18 +417,14 @@
           },
           {
             "title": "Calibrate road speeds",
-            "description": "Compare simulated journey times against the tracked ones and adjust the per-highway-type speeds until the two agree. The result becomes the global road speed table.",
-            "video": "vehicle-tracking",
-            "tools": [
-              "tracking-overview"
-            ]
+            "description": "Fit one speed per highway type so that routed journey times agree with the durations actually recorded. The input is the per-trip analysis written by the previous step, which breaks every trip down into how many metres it spent on each type of road.\n\nSolving for speed directly is awkward: trip time is a sum of distance divided by speed, which is non-linear, needs a starting guess and can settle in a local optimum. The fit therefore works in slowness — seconds per metre, the reciprocal of speed — which makes a trip's time simply its per-type distances multiplied by the per-type slownesses. That is linear, so calibration becomes an ordinary bounded regression with a single global optimum and no iteration or heuristic anywhere. The speeds come back as the reciprocals at the end.\n\nTwo objectives are available. Fitting to the mean minimises squared time errors, solved as a bounded least-squares problem in milliseconds, but squaring lets a handful of stuck-in-traffic trips drag every speed with them. Fitting to the median minimises absolute errors instead, which is solved exactly as a linear program by splitting each trip's error into its positive and negative parts — slower, with one constraint per trip, but it matches a typical journey and largely ignores freak ones. For GPS durations, which carry a long tail of standing still, the median fit is usually the honest choice. Either way both errors are reported, so the effect of the choice is visible rather than asserted.\n\nEvery type is bounded by its minimum and maximum plausible speed, so no type can be handed a value that is arithmetically optimal and physically nonsense. Types covering too little distance to constrain are held at their current value rather than fitted, and types always used together cannot be separated at all — the fit splits the difference and no amount of data changes that.\n\nOne caveat outweighs the algorithm: recorded durations include time stopped in traffic, at lights and waiting, so the fitted values are effective door-to-door speeds rather than free-flow limits and will come out slower than a speed limit. That may be exactly what a simulation wants; if not, the idle time can be subtracted first and the fit made to moving time. The result becomes the global road speed table every model type then runs with.",
+            "video": "vehicle-tracking"
           },
           {
             "title": "Calibrate trip distance and wait distributions",
             "description": "Fit the distance and fare-wait distributions to the tracked trips, so a run can draw journeys from measured behaviour rather than from fixed demand points. These are what a trip distribution scenario then uses.",
             "video": "vehicle-tracking",
             "tools": [
-              "tracking-overview",
               "track-viewer"
             ]
           },

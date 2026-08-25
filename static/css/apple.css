@@ -1996,6 +1996,13 @@ label.btn { cursor: pointer; }
   .ap-flow-join { display: none; }
 }
 
+/* The step description is set as text rather than markup, so blank lines in it
+   are what separate its paragraphs. A step needing more than a sentence - how a
+   fit is posed, say - then reads as prose instead of one block. */
+.ap-step-desc {
+  white-space: pre-line;
+}
+
 /* -------------------------------------------------------------------------
    21. About
    ---------------------------------------------------------------------- */
