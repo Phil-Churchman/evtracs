@@ -55,7 +55,11 @@
     );
   }
 
-  function stage(label, stageSteps, isLast) {
+  /* Each stage carries its own hue, on its numbers and on the arrows between
+     its steps. The arrow down to the next stage takes that stage's colour, so
+     it reads as leading into what comes next rather than closing off what came
+     before. */
+  function stage(spec, stageSteps, next) {
     var boxes = stageSteps
       .map(function (entry) {
         return stepBox(entry.index, entry.step);
@@ -64,12 +68,14 @@
             '<i class="bi bi-chevron-right"></i></span>');
 
     return (
-      '<section class="ap-flow-stage">' +
-      '<h2 class="ap-flow-stage-title">' + E.escapeHtml(label) + "</h2>" +
+      '<section class="ap-flow-stage is-' + E.escapeHtml(spec.id) + '">' +
+      '<h2 class="ap-flow-stage-title">' + E.escapeHtml(spec.label) + "</h2>" +
       '<div class="ap-flow-steps">' + (boxes || '<span class="ap-hint mb-0">No steps.</span>') +
       "</div></section>" +
-      (isLast ? "" : '<div class="ap-flow-down" aria-hidden="true">' +
-                     '<i class="bi bi-arrow-down"></i></div>')
+      (next
+        ? '<div class="ap-flow-down is-' + E.escapeHtml(next.id) + '" aria-hidden="true">' +
+          '<i class="bi bi-arrow-down"></i></div>'
+        : "")
     );
   }
 
@@ -90,7 +96,7 @@
           steps.push({ step: step, stage: stageSpec.label });
           return { index: steps.length - 1, step: step };
         });
-        return stage(stageSpec.label, entries, position === stages.length - 1);
+        return stage(stageSpec, entries, stages[position + 1]);
       })
       .join("");
 

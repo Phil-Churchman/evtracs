@@ -139,6 +139,9 @@
 :root[data-bs-theme="dark"] {
   color-scheme: dark;
 
+  --bs-success-rgb: 48, 209, 88;
+  --bs-warning-rgb: 255, 159, 10;
+
   --ap-blue: #0a84ff;
   --ap-blue-hover: #3b9bff;
   --ap-blue-active: #0071e3;
@@ -1196,6 +1199,26 @@ a.ap-tile:hover {
   border-bottom: 1px solid var(--ap-hairline);
 }
 
+/* Screenshot at the head of the home page. Bordered rather than floating, so a
+   map full of pale terrain does not bleed into the page behind it. */
+.ap-hero { margin: 0; }
+
+.ap-hero-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--ap-hairline);
+  border-radius: var(--ap-r-lg);
+  box-shadow: var(--ap-shadow-sm);
+}
+
+.ap-hero figcaption {
+  font-size: 0.8125rem;
+  color: var(--ap-ink-4);
+  margin-top: 0.625rem;
+  text-align: center;
+}
+
 /* A tile for something this scenario has not published: still legible, but
    plainly not a link. */
 .ap-tile-muted {
@@ -1827,6 +1850,33 @@ label.btn { cursor: pointer; }
    20. Model overview flow chart
    ---------------------------------------------------------------------- */
 
+/* One hue per stage, so Define / Run / View / Analyse read apart at a glance.
+   Declared on the stage and on the arrow leading into it, then picked up by the
+   numbers, chevrons, title and hover states inside. */
+.ap-flow-stage,
+.ap-flow-down {
+  --ap-stage: var(--ap-blue);
+  --ap-stage-soft: var(--ap-blue-soft);
+}
+
+.ap-flow-stage.is-run,
+.ap-flow-down.is-run {
+  --ap-stage: var(--ap-orange);
+  --ap-stage-soft: rgba(var(--bs-warning-rgb), 0.16);
+}
+
+.ap-flow-stage.is-view,
+.ap-flow-down.is-view {
+  --ap-stage: var(--ap-purple);
+  --ap-stage-soft: rgba(175, 82, 222, 0.16);
+}
+
+.ap-flow-stage.is-analyse,
+.ap-flow-down.is-analyse {
+  --ap-stage: var(--ap-green);
+  --ap-stage-soft: rgba(var(--bs-success-rgb), 0.16);
+}
+
 /* Stages run down the page as lanes rather than across as columns: a stage can
    hold one step or seven, and columns of wildly different heights read worse
    than rows that simply wrap. */
@@ -1843,7 +1893,7 @@ label.btn { cursor: pointer; }
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ap-ink-4);
+  color: var(--ap-stage);
   margin: 0 0 0.875rem;
 }
 
@@ -1875,28 +1925,28 @@ label.btn { cursor: pointer; }
 }
 
 .ap-flow-step:hover {
-  border-color: var(--ap-blue);
-  background: var(--ap-blue-soft);
+  border-color: var(--ap-stage);
+  background: var(--ap-stage-soft);
 }
 
 .ap-flow-step:active { transform: scale(0.985); }
 
 .ap-flow-step-no {
   flex: none;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--ap-fill);
-  color: var(--ap-ink-3);
+  background: var(--ap-stage-soft);
+  color: var(--ap-stage);
   font-size: 0.6875rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .ap-flow-step:hover .ap-flow-step-no {
-  background: var(--ap-blue);
+  background: var(--ap-stage);
   color: #fff;
 }
 
@@ -1910,22 +1960,33 @@ label.btn { cursor: pointer; }
   font-size: 0.875rem;
 }
 
-.ap-flow-step:hover .ap-flow-step-video { color: var(--ap-blue); }
+.ap-flow-step:hover .ap-flow-step-video { color: var(--ap-stage); }
 
 .ap-flow-join {
   display: flex;
   align-items: center;
-  color: var(--ap-ink-4);
-  font-size: 0.75rem;
+  color: var(--ap-stage);
+  font-size: 0.875rem;
+  font-weight: 600;
+  opacity: 0.6;
   flex: none;
 }
 
 .ap-flow-down {
   display: flex;
   justify-content: center;
-  color: var(--ap-ink-4);
-  padding: 0.5rem 0;
-  font-size: 1.125rem;
+  padding: 0.625rem 0;
+}
+
+.ap-flow-down i {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1.0625rem;
+  background: var(--ap-stage-soft);
+  color: var(--ap-stage);
 }
 
 /* On a phone the steps stack, so the between-step chevrons would point the
