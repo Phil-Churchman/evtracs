@@ -23,9 +23,19 @@
       },
       "outputs": [
         {
+          "file": "data/accra/outputs/agent_time_histograms.png",
+          "title": "Agent time histograms",
+          "bytes": 92086
+        },
+        {
           "file": "data/accra/outputs/station_queues_analysis.png",
           "title": "Station queues analysis",
           "bytes": 630726
+        },
+        {
+          "file": "data/accra/outputs/swap_station_arrivals_grid.png",
+          "title": "Swap station arrivals grid",
+          "bytes": 321489
         }
       ],
       "synced_from": "scenario_accra.json"
@@ -51,7 +61,12 @@
         {
           "file": "data/accra-okada/outputs/station_queues_analysis.png",
           "title": "Station queues analysis",
-          "bytes": 694780
+          "bytes": 644621
+        },
+        {
+          "file": "data/accra-okada/outputs/trip_distribution_comparison.png",
+          "title": "Trip distribution comparison",
+          "bytes": 180973
         }
       ],
       "synced_from": "scenario_accra_okada.json"
@@ -75,9 +90,19 @@
       },
       "outputs": [
         {
+          "file": "data/bechem/outputs/agent_time_histograms.png",
+          "title": "Agent time histograms",
+          "bytes": 86249
+        },
+        {
           "file": "data/bechem/outputs/station_queues_analysis.png",
           "title": "Station queues analysis",
-          "bytes": 71958
+          "bytes": 80509
+        },
+        {
+          "file": "data/bechem/outputs/swap_station_arrivals_grid.png",
+          "title": "Swap station arrivals grid",
+          "bytes": 99724
         }
       ],
       "synced_from": "scenario_bechem.json"
@@ -95,7 +120,7 @@
       "demand_points": null,
       "demand_frequencies": null,
       "animation": {
-        "agent_count": 10,
+        "agent_count": 117,
         "agent_path": "data/nairobi/animation/agents/",
         "station_log": null
       },
@@ -142,6 +167,42 @@
         }
       ],
       "synced_from": "scenario_nairobi.json"
+    },
+    {
+      "id": "workshop",
+      "name": "Workshop",
+      "mode": "demand_model",
+      "parameters": "data/workshop/parameters.json",
+      "area": "data/workshop/area.geojson",
+      "area_source": "Imported from file",
+      "area_source_label": "Model_data/workshop/geojson_files/area.geojson",
+      "swap_stations": "data/workshop/swap_stations.geojson",
+      "taxi_ranks": null,
+      "demand_points": "data/workshop/demand_points.geojson",
+      "demand_frequencies": "data/workshop/demand_frequencies.json",
+      "animation": {
+        "agent_count": 10,
+        "agent_path": "data/workshop/animation/agents/",
+        "station_log": "data/workshop/animation/swap_station_timesteps.xlsx"
+      },
+      "outputs": [
+        {
+          "file": "data/workshop/outputs/agent_time_histograms.png",
+          "title": "Agent time histograms",
+          "bytes": 88379
+        },
+        {
+          "file": "data/workshop/outputs/station_queues_analysis.png",
+          "title": "Station queues analysis",
+          "bytes": 72422
+        },
+        {
+          "file": "data/workshop/outputs/swap_station_arrivals_grid.png",
+          "title": "Swap station arrivals grid",
+          "bytes": 101836
+        }
+      ],
+      "synced_from": "scenario_workshop.json"
     }
   ]
 }

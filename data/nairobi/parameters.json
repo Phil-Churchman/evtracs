@@ -1,6 +1,6 @@
 {
   "note": "Road speeds updated based on calibration with captured trips from Nairobi, Kenya.",
-  "simulation_mode": "demand_model",
+  "simulation_mode": "calibration",
   "speed_based_routing": true,
   "agents": [
     0,
@@ -12,7 +12,7 @@
     4,
     2
   ],
-  "animation_agents": 10,
+  "animation_agents": 200,
   "probability_hail": 0.75,
   "start_time": [
     2025,
